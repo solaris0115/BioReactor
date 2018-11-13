@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+	<ThingDef ParentName="BuildingBase">
+		<defName>BioReactor</defName>
+		<label>Bio Reactor</label>
+		<description>Living Battery</description>
+		<thingClass>BioReactor.Building_BioReactor</thingClass>
+		<graphicData>
+			<texPath>Things/Building/cell3</texPath>
+			<graphicClass>Graphic_Single</graphicClass>
+			<drawSize>(7, 7)</drawSize>
+			<drawRotated>false</drawRotated>
+			<!-- <shadowData> -->
+				<!-- <volume>(0.83, 0.3, 1.7)</volume> -->
+			<!-- </shadowData> -->
+		</graphicData>
+		<altitudeLayer>Pawn</altitudeLayer>
+		<passability>PassThroughOnly</passability>
+		<pathCost>25</pathCost>
+		<blockWind>true</blockWind>
+		<fillPercent>0.5</fillPercent>
+		<canOverlapZones>false</canOverlapZones>
+		<statBases>
+			<WorkToBuild>3200</WorkToBuild>
+			<MaxHitPoints>250</MaxHitPoints>
+			<Flammability>0.2</Flammability>
+		</statBases>
+		<tickerType>Normal</tickerType>
+		<size>(2,2)</size>
+		<designationCategory>Power</designationCategory>
+		<hasInteractionCell>true</hasInteractionCell>
+		<interactionCellOffset>(0,0,2)</interactionCellOffset>
+		<defaultPlacingRot>South</defaultPlacingRot>
+		<building>
+			<ai_chillDestination>false</ai_chillDestination>
+		</building>
+		<costList>
+			<Steel>180</Steel>
+			<Uranium>5</Uranium>
+			<ComponentIndustrial>4</ComponentIndustrial>
+			<ComponentSpacer>1</ComponentSpacer>
+		</costList>
+		<comps>
+			<li Class="CompProperties_Power">
+				<compClass>BioReactor.CompBioPowerPlant</compClass>
+				<basePowerConsumption>-1000</basePowerConsumption>
+				<transmitsPower>true</transmitsPower>
+			</li>
+			<li Class="CompProperties_Flickable" />
+			<li Class="CompProperties_Refuelable">
+				<fuelConsumptionRate>2.0</fuelConsumptionRate>
+				<fuelCapacity>75.0</fuelCapacity>
+				<fuelFilter>
+					<categories>
+						<li>FoodRaw</li>
+						<li>Corpses</li>
+					</categories>
+				</fuelFilter>
+			</li>
+			<li Class="CompProperties_Glower">
+				<glowRadius>6</glowRadius>
+				<glowColor>(123,255,233,0)</glowColor>
+			</li>
+			<!-- <li Class="CompProperties_HeatPusher"> -->
+				<!-- <compClass>CompHeatPusherPowered</compClass> -->
+				<!-- <heatPerSecond>6</heatPerSecond> -->
+			<!-- </li> -->
+			<li Class="CompProperties_Breakdownable"/>
+			<li Class="CompProperties_Explosive">
+				<explosiveRadius>2.66</explosiveRadius>
+				<explosiveDamageType>Flame</explosiveDamageType>
+			</li>
+			<li Class="BioReactor.CompProperties_SecondLayer">
+				<graphicData>
+					<texPath>Things/Building/floor</texPath>
+					<graphicClass>Graphic_Single</graphicClass>
+					<drawSize>(3.5,3.5)</drawSize>
+					<drawRotated>false</drawRotated>
+				</graphicData>
+				<offset>(0,0,0.5)</offset>
+				<altitudeLayer>LayingPawn</altitudeLayer>
+			</li>
+		</comps>
+		<terrainAffordanceNeeded>Medium</terrainAffordanceNeeded>
+		<constructionSkillPrerequisite>8</constructionSkillPrerequisite>
+		<researchPrerequisites>
+			<li>Cryptosleep</li>
+		</researchPrerequisites>
+		<destroyable>true</destroyable>
+		<rotatable>false</rotatable>
+	</ThingDef>
+
+	<!-- <JobDef> -->
+		<!-- <defName>EnterBioReactor</defName> -->
+		<!-- <driverClass>JobDriver_EnterCryptosleepCasket</driverClass> -->
+		<!-- <reportString>entering cryptosleep casket.</reportString> -->
+		<!-- <taleOnCompletion>EnteredCryptosleep</taleOnCompletion> -->
+		<!-- <allowOpportunisticPrefix>true</allowOpportunisticPrefix> -->
+	<!-- </JobDef> -->
+</Defs>
