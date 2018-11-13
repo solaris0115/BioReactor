@@ -12,7 +12,7 @@
 			<drawSize>(7, 7)</drawSize>
 			<drawRotated>false</drawRotated>
 			<!-- <shadowData> -->
-				<!-- <volume>(0.83, 0.3, 1.7)</volume> -->
+			<!-- <volume>(0.83, 0.3, 1.7)</volume> -->
 			<!-- </shadowData> -->
 		</graphicData>
 		<altitudeLayer>Pawn</altitudeLayer>
@@ -54,17 +54,16 @@
 				<fuelFilter>
 					<categories>
 						<li>FoodRaw</li>
-						<li>Corpses</li>
 					</categories>
 				</fuelFilter>
 			</li>
 			<li Class="CompProperties_Glower">
-				<glowRadius>6</glowRadius>
+				<glowRadius>4</glowRadius>
 				<glowColor>(123,255,233,0)</glowColor>
 			</li>
 			<!-- <li Class="CompProperties_HeatPusher"> -->
-				<!-- <compClass>CompHeatPusherPowered</compClass> -->
-				<!-- <heatPerSecond>6</heatPerSecond> -->
+			<!-- <compClass>CompHeatPusherPowered</compClass> -->
+			<!-- <heatPerSecond>6</heatPerSecond> -->
 			<!-- </li> -->
 			<li Class="CompProperties_Breakdownable"/>
 			<li Class="CompProperties_Explosive">
@@ -91,11 +90,79 @@
 		<rotatable>false</rotatable>
 	</ThingDef>
 
-	<!-- <JobDef> -->
-		<!-- <defName>EnterBioReactor</defName> -->
-		<!-- <driverClass>JobDriver_EnterCryptosleepCasket</driverClass> -->
-		<!-- <reportString>entering cryptosleep casket.</reportString> -->
-		<!-- <taleOnCompletion>EnteredCryptosleep</taleOnCompletion> -->
-		<!-- <allowOpportunisticPrefix>true</allowOpportunisticPrefix> -->
-	<!-- </JobDef> -->
+	
+	<JobDef>
+		<defName>CarryToBioReactor</defName>
+		<driverClass>BioReactor.JobDriver_CarryToBioReactor</driverClass>
+		<reportString>carrying TargetA to BioReactor.</reportString>
+		<casualInterruptible>false</casualInterruptible>
+		<taleOnCompletion>PutIntoBioReactor</taleOnCompletion>
+	</JobDef>
+	
+	
+	<JobDef>
+		<defName>EnterBioReactor</defName>
+		<driverClass>BioReactor.JobDriver_EnterBioReactor</driverClass>
+		<reportString>entering BioReactor.</reportString>
+		<taleOnCompletion>EnteredBioReactor</taleOnCompletion>
+		<allowOpportunisticPrefix>true</allowOpportunisticPrefix>
+	</JobDef>
+	
+	
+	<TaleDef>
+		<defName>PutIntoBioReactor</defName>
+		<label>put into BioReactor</label>
+		<taleClass>Tale_DoublePawn</taleClass>
+		<type>Volatile</type>
+		<baseInterest>5</baseInterest>
+		<firstPawnSymbol>CARRIER</firstPawnSymbol>
+		<secondPawnSymbol>SLEEPER</secondPawnSymbol>
+		<rulePack>
+			<rulesStrings>
+				<li>tale_noun->[CARRIER_nameDef] putting [SLEEPER_nameDef] into BioReactor</li>
+				<li>image->[CARRIER_nameFull] placing [SLEEPER_nameDef] inside a BioReactor [circumstance_group]</li>
+				<li>image->[CARRIER_nameFull] opening an empty BioReactor while supporting [SLEEPER_nameDef] [circumstance_group]</li>
+				<li>image->[CARRIER_nameFull] sealing [SLEEPER_nameDef] inside a BioReactor [circumstance_group]</li>
+				<li>image->[CARRIER_nameFull] walking away as [SLEEPER_nameDef] looks through the wall of a BioReactor [circumstance_group]</li>
+				<li>circumstance_phrase(p=3)->with a [AdjectiveAny] expression</li>
+				<li>circumstance_phrase->while consumed in thought</li>
+				<li>circumstance_phrase->while gazing at a faraway [TerrainFeature]</li>
+				<li>circumstance_phrase->with visible tension between the two</li>
+				<li>desc_sentence->[Quantity_adjphrase] [Animal]s rest near the scene.</li>
+				<li>desc_sentence->[Quantity_adjphrase] [Enemy]s approach the area.</li>
+				<li>desc_sentence->[CARRIER_nameDef] radiates determination.</li>
+				<li>desc_sentence->[SLEEPER_nameDef] is visibly wounded.</li>
+				<li>desc_sentence->[SLEEPER_nameDef] looks exhausted.</li>
+				<li>desc_sentence->[Quantity_adjphrase] filled BioReactor surround the scene.</li>
+			</rulesStrings>
+		</rulePack>
+	</TaleDef>
+	
+	<TaleDef>
+    <defName>EnteredBioReactor</defName>
+    <label>entered BioReactor</label>
+    <taleClass>Tale_SinglePawn</taleClass>
+    <type>Volatile</type>
+    <baseInterest>5</baseInterest>
+    <rulePack>
+      <rulesStrings>
+        <li>tale_noun->[PAWN_nameDef] entering BioReactor</li>
+        <li>image->[PAWN_nameFull] put in to BioReactor [circumstance_group]</li>
+        <li>image->[PAWN_nameFull] opening an empty BioReactor [circumstance_group]</li>
+        <li>image->[PAWN_nameFull] sealing themselves inside a BioReactor [circumstance_group]</li>
+        <li>image->[PAWN_nameFull] looking through the wall of a BioReactor at a world they're about to leave [circumstance_group]</li>
+        <li>circumstance_phrase->with a [AdjectiveAngsty] expression</li>
+        <li>circumstance_phrase->while consumed in thought</li>
+        <li>circumstance_phrase->while gazing at a faraway [TerrainFeature]</li>
+        <li>circumstance_phrase->and talking quietly to themselves</li>
+        <li>desc_sentence->[Quantity_adjphrase] [Animal]s rest near the scene.</li>
+        <li>desc_sentence->[Quantity_adjphrase] [Enemy]s approach the area.</li>
+        <li>desc_sentence->[PAWN_nameDef] radiates determination.</li>
+        <li>desc_sentence->[PAWN_nameDef] is visibly wounded.</li>
+        <li>desc_sentence->A [Color] aurora shines in the background.</li>
+        <li>desc_sentence->[Quantity_adjphrase] filled BioReactor surround the scene.</li>
+      </rulesStrings>
+    </rulePack>
+  </TaleDef>
+
 </Defs>

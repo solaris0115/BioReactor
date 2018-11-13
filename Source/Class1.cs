@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Linq;
 using System.Text;
 using RimWorld;
@@ -7,48 +8,98 @@ using Verse;
 using Verse.AI;
 using Verse.Sound;
 using UnityEngine;
+using Harmony;
+using RimWorld.Planet;
 
 namespace BioReactor
 {
     public class CompBioPowerPlant : CompPowerPlant
-	{
-        public Building_Casket building_BioReactor;
-
-		protected override float DesiredPowerOutput
-		{
-			get
-			{
-				return -base.Props.basePowerConsumption;
-			}
-		}
-
-		public override void PostSpawnSetup(bool respawningAfterLoad)
-		{
-            base.PostSpawnSetup(respawningAfterLoad);
-            building_BioReactor = (Building_Casket)parent; 
-		}
-
-		public override void CompTick()
-		{
-			base.CompTick();
-			this.UpdateDesiredPowerOutput();
-		}
-
-		public new void UpdateDesiredPowerOutput()
-		{
-			if ( (building_BioReactor!=null && !building_BioReactor.HasAnyContents) || (this.breakdownableComp != null && this.breakdownableComp.BrokenDown) || (this.refuelableComp != null && !this.refuelableComp.HasFuel) || (this.flickableComp != null && !this.flickableComp.SwitchIsOn) || !base.PowerOn)
-			{
-				base.PowerOutput = 0f;
-			}
-			else
-			{
-				base.PowerOutput = this.DesiredPowerOutput;
-			}
-		}
-    }
-    public class CompBioRefuelable : CompRefuelable
     {
+        public Building_Casket building_BioReactor;
+        public CompRefuelable compRefuelable;
 
+        protected override float DesiredPowerOutput
+        {
+            get
+            {
+                return -base.Props.basePowerConsumption;
+            }
+        }
+
+        public override void PostSpawnSetup(bool respawningAfterLoad)
+        {
+            base.PostSpawnSetup(respawningAfterLoad);
+            building_BioReactor = (Building_Casket)parent;
+            compRefuelable = parent.GetComp<CompRefuelable>();
+        }
+
+        public override void CompTick()
+        {
+            base.CompTick();
+            this.UpdateDesiredPowerOutput();
+        }
+
+        public new void UpdateDesiredPowerOutput()
+        {
+            if ((building_BioReactor != null && !building_BioReactor.HasAnyContents) || (this.breakdownableComp != null && this.breakdownableComp.BrokenDown) || (this.refuelableComp != null && !this.refuelableComp.HasFuel) || (this.flickableComp != null && !this.flickableComp.SwitchIsOn) || !base.PowerOn)
+            {
+                base.PowerOutput = 0f;
+            }
+            else
+            {
+                Pawn pawn = building_BioReactor.ContainedThing as Pawn;
+                if (pawn != null)
+                {
+                    if (pawn.Dead)
+                    {
+                        PowerOutput = 0;
+                        return;
+                    }
+                }
+                base.PowerOutput = this.DesiredPowerOutput;
+            }
+        }
+
+        public override IEnumerable<Gizmo> CompGetGizmosExtra()
+        {
+            foreach (Gizmo c in base.CompGetGizmosExtra())
+            {
+                yield return c;
+            }
+            if (building_BioReactor.HasAnyContents)
+            {
+                Pawn pawn = building_BioReactor.ContainedThing as Pawn;
+                if (pawn != null)
+                {
+                    yield return new Command_Action
+                    {
+                        defaultLabel = "Histolysis".Translate(),
+                        defaultDesc = "HistolysisDesc".Translate(),
+                        icon = ContentFinder<Texture2D>.Get("UI/Commands/Histolysis", true),
+                        action = delegate ()
+                        {
+                            compRefuelable.Refuel(100);
+                            DamageInfo d = new DamageInfo();
+                            d.Def = DamageDefOf.Burn;
+                            d.SetAmount(1000);
+                            pawn.Kill(d);
+                            try
+                            {
+                                CompRottable compRottable = building_BioReactor.ContainedThing.TryGetComp<CompRottable>();
+                                if (compRottable != null)
+                                {
+                                    compRottable.RotProgress += 600000f;
+                                }
+                            }
+                            catch (Exception ee)
+                            {
+                                Log.Message("Rot Error" + ee);
+                            }
+                        }
+                    };
+                }
+            }
+        }
     }
     internal class CompProperties_SecondLayer : CompProperties
     {
@@ -105,14 +156,14 @@ namespace BioReactor
         {
             if (parent.Rotation == Rot4.South)
             {
-                this.Graphic.Draw(GenThing.TrueCenter(this.parent.Position, this.parent.Rotation, this.parent.def.size, Props.Altitude)+ offset, this.parent.Rotation, this.parent, 0f);
+                this.Graphic.Draw(GenThing.TrueCenter(this.parent.Position, this.parent.Rotation, this.parent.def.size, Props.Altitude) + offset, this.parent.Rotation, this.parent, 0f);
                 return;
             }
 
         }
     }
 
-    public class Building_BioReactor : Building_CryptosleepCasket
+    public class Building_BioReactor : Building_Casket
     {
         public override bool TryAcceptThing(Thing thing, bool allowSpecialEffects = true)
         {
@@ -132,6 +183,25 @@ namespace BioReactor
             foreach (FloatMenuOption o in base.GetFloatMenuOptions(myPawn))
             {
                 yield return o;
+            }
+            if (this.innerContainer.Count == 0)
+            {
+                if (!myPawn.CanReach(this, PathEndMode.InteractionCell, Danger.Deadly, false, TraverseMode.ByPawn))
+                {
+                    FloatMenuOption failer = new FloatMenuOption("CannotUseNoPath".Translate(), null, MenuOptionPriority.Default, null, null, 0f, null, null);
+                    yield return failer;
+                }
+                else
+                {
+                    JobDef jobDef = Bio_JobDefOf.EnterBioReactor;
+                    string jobStr = "EnterBioReactor".Translate();
+                    Action jobAction = delegate ()
+                    {
+                        Job job = new Job(jobDef, this);
+                        myPawn.jobs.TryTakeOrderedJob(job, JobTag.Misc);
+                    };
+                    yield return FloatMenuUtility.DecoratePrioritizedTask(new FloatMenuOption(jobStr, jobAction, MenuOptionPriority.Default, null, null, 0f, null, null), myPawn, this, "ReservedBy");
+                }
             }
             yield break;
         }
@@ -182,22 +252,72 @@ namespace BioReactor
             base.EjectContents();
         }
 
+        public static Building_BioReactor FindBioReactorFor(Pawn p, Pawn traveler, bool ignoreOtherReservations = false)
+        {
+            IEnumerable<ThingDef> enumerable = from def in DefDatabase<ThingDef>.AllDefs
+                                               where typeof(Building_BioReactor).IsAssignableFrom(def.thingClass)
+                                               select def;
+            foreach (ThingDef singleDef in enumerable)
+            {
+                Building_BioReactor building_BioReactor = (Building_BioReactor)GenClosest.ClosestThingReachable(p.Position, p.Map, ThingRequest.ForDef(singleDef), PathEndMode.InteractionCell, TraverseParms.For(traveler, Danger.Deadly, TraverseMode.ByPawn, false), 9999f, delegate (Thing x)
+                {
+                    bool result;
+                    if (!((Building_BioReactor)x).HasAnyContents)
+                    {
+                        Pawn traveler2 = traveler;
+                        LocalTargetInfo target = x;
+                        bool ignoreOtherReservations2 = ignoreOtherReservations;
+                        result = traveler2.CanReserve(target, 1, -1, null, ignoreOtherReservations2);
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+                    return result;
+                }, null, 0, -1, false, RegionType.Set_Passable, false);
+                if (building_BioReactor != null)
+                {
+                    return building_BioReactor;
+                }
+            }
+            return null;
+        }
+
         public override void Draw()
         {
-            foreach (Pawn t in innerContainer)
+            foreach (Thing t in innerContainer)
             {
-                DrawInnerThing(t, DrawPos + new Vector3(0, -0.05f, 0.65f), 1.7f, true, Rot4.South, Rot4.South, RotDrawMode.Fresh, false, false);
-                GenDraw.FillableBarRequest r = default(GenDraw.FillableBarRequest);
-                r.center = this.DrawPos + new Vector3(0, -0.02f, 0.65f);
-                r.size = new Vector2(1.6f, 1.2f);
-                r.fillPercent = 1;
-                r.filledMat = SolidColorMaterials.SimpleSolidColorMaterial(new Color32(123, 255, 233, 75), false);
-                r.unfilledMat = SolidColorMaterials.SimpleSolidColorMaterial(new Color32(0, 0, 0, 0), false);
-                r.margin = 0.15f;
-                Rot4 rotation = Rotation;
-                rotation.Rotate(RotationDirection.Clockwise);
-                r.rotation = rotation;
-                GenDraw.DrawFillableBar(r);
+                Pawn pawn = t as Pawn;
+                if (pawn != null)
+                {
+                    DrawInnerThing(pawn, DrawPos + new Vector3(0, -0.05f, 0.65f), 1.7f, true, Rot4.South, Rot4.South, RotDrawMode.Fresh, false, false);
+                    GenDraw.FillableBarRequest r = default(GenDraw.FillableBarRequest);
+                    r.center = this.DrawPos + new Vector3(0, -0.02f, 0.65f);
+                    r.size = new Vector2(1.6f, 1.2f);
+                    r.fillPercent = 1;
+                    r.filledMat = SolidColorMaterials.SimpleSolidColorMaterial(new Color32(123, 255, 233, 75), false);
+                    r.unfilledMat = SolidColorMaterials.SimpleSolidColorMaterial(new Color32(0, 0, 0, 0), false);
+                    r.margin = 0f;
+                    Rot4 rotation = Rotation;
+                    rotation.Rotate(RotationDirection.Clockwise);
+                    r.rotation = rotation;
+                    GenDraw.DrawFillableBar(r);
+                }
+                else
+                {
+                    t.DrawAt(DrawPos + new Vector3(0, -0.05f, 0.65f));
+                    GenDraw.FillableBarRequest r = default(GenDraw.FillableBarRequest);
+                    r.center = this.DrawPos + new Vector3(0, -0.02f, 0.65f);
+                    r.size = new Vector2(1.6f, 1.2f);
+                    r.fillPercent = 1;
+                    r.filledMat = SolidColorMaterials.SimpleSolidColorMaterial(new Color32(200, 45, 45, 75), false);
+                    r.unfilledMat = SolidColorMaterials.SimpleSolidColorMaterial(new Color32(0, 0, 0, 0), false);
+                    r.margin = 0.15f;
+                    Rot4 rotation = Rotation;
+                    rotation.Rotate(RotationDirection.Clockwise);
+                    r.rotation = rotation;
+                    GenDraw.DrawFillableBar(r);
+                }
             }
             base.Draw();
         }
@@ -328,4 +448,212 @@ namespace BioReactor
         }
     }
 
+    public class JobDriver_CarryToBioReactor : JobDriver
+    {
+        private const TargetIndex TakeeInd = TargetIndex.A;
+
+        private const TargetIndex DropPodInd = TargetIndex.B;
+
+        protected Pawn Takee
+        {
+            get
+            {
+                return (Pawn)this.job.GetTarget(TargetIndex.A).Thing;
+            }
+        }
+
+        protected Building_BioReactor DropPod
+        {
+            get
+            {
+                return (Building_BioReactor)this.job.GetTarget(TargetIndex.B).Thing;
+            }
+        }
+
+        public override bool TryMakePreToilReservations(bool errorOnFailed)
+        {
+            Pawn pawn = this.pawn;
+            LocalTargetInfo target = this.Takee;
+            Job job = this.job;
+            bool result;
+            if (pawn.Reserve(target, job, 1, -1, null, errorOnFailed))
+            {
+                pawn = this.pawn;
+                target = this.DropPod;
+                job = this.job;
+                result = pawn.Reserve(target, job, 1, -1, null, errorOnFailed);
+            }
+            else
+            {
+                result = false;
+            }
+            return result;
+        }
+
+        protected override IEnumerable<Toil> MakeNewToils()
+        {
+            this.FailOnDestroyedOrNull(TargetIndex.A);
+            this.FailOnDestroyedOrNull(TargetIndex.B);
+            this.FailOnAggroMentalState(TargetIndex.A);
+            this.FailOn(() => !this.DropPod.Accepts(this.Takee));
+            yield return Toils_Goto.GotoThing(TargetIndex.A, PathEndMode.OnCell).FailOnDestroyedNullOrForbidden(TargetIndex.A).FailOnDespawnedNullOrForbidden(TargetIndex.B).FailOn(() => this.DropPod.GetDirectlyHeldThings().Count > 0).FailOn(() => !this.Takee.Downed).FailOn(() => !this.pawn.CanReach(this.Takee, PathEndMode.OnCell, Danger.Deadly, false, TraverseMode.ByPawn)).FailOnSomeonePhysicallyInteracting(TargetIndex.A);
+            yield return Toils_Haul.StartCarryThing(TargetIndex.A, false, false, false);
+            yield return Toils_Goto.GotoThing(TargetIndex.B, PathEndMode.InteractionCell);
+            Toil prepare = Toils_General.Wait(500, TargetIndex.None);
+            prepare.FailOnCannotTouch(TargetIndex.B, PathEndMode.InteractionCell);
+            prepare.WithProgressBarToilDelay(TargetIndex.B, false, -0.5f);
+            yield return prepare;
+            yield return new Toil
+            {
+                initAction = delegate ()
+                {
+                    this.DropPod.TryAcceptThing(this.Takee, true);
+                },
+                defaultCompleteMode = ToilCompleteMode.Instant
+            };
+            yield break;
+        }
+
+        public override object[] TaleParameters()
+        {
+            return new object[]
+            {
+                this.pawn,
+                this.Takee
+            };
+        }
+    }
+
+    public class JobDriver_EnterBioReactor : JobDriver
+    {
+        public override bool TryMakePreToilReservations(bool errorOnFailed)
+        {
+            Pawn pawn = this.pawn;
+            LocalTargetInfo targetA = this.job.targetA;
+            Job job = this.job;
+            return pawn.Reserve(targetA, job, 1, -1, null, errorOnFailed);
+        }
+
+        protected override IEnumerable<Toil> MakeNewToils()
+        {
+            this.FailOnDespawnedOrNull(TargetIndex.A);
+            yield return Toils_Goto.GotoThing(TargetIndex.A, PathEndMode.InteractionCell);
+            Toil prepare = Toils_General.Wait(500, TargetIndex.None);
+            prepare.FailOnCannotTouch(TargetIndex.A, PathEndMode.InteractionCell);
+            prepare.WithProgressBarToilDelay(TargetIndex.A, false, -0.5f);
+            yield return prepare;
+            Toil enter = new Toil();
+            enter.initAction = delegate ()
+            {
+                Pawn actor = enter.actor;
+                Building_BioReactor pod = (Building_BioReactor)actor.CurJob.targetA.Thing;
+                Action action = delegate ()
+                {
+                    actor.DeSpawn(DestroyMode.Vanish);
+                    pod.TryAcceptThing(actor, true);
+                };
+                if (!pod.def.building.isPlayerEjectable)
+                {
+                    int freeColonistsSpawnedOrInPlayerEjectablePodsCount = this.Map.mapPawns.FreeColonistsSpawnedOrInPlayerEjectablePodsCount;
+                    if (freeColonistsSpawnedOrInPlayerEjectablePodsCount <= 1)
+                    {
+                        Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation("CasketWarning".Translate(actor.Named("PAWN")).AdjustedFor(actor, "PAWN"), action, false, null));
+                    }
+                    else
+                    {
+                        action();
+                    }
+                }
+                else
+                {
+                    action();
+                }
+            };
+            enter.defaultCompleteMode = ToilCompleteMode.Instant;
+            yield return enter;
+            yield break;
+        }
+    }
+
+    [DefOf]
+    public static class Bio_JobDefOf
+    {
+        public static JobDef CarryToBioReactor;
+
+        public static JobDef EnterBioReactor;
+    }
+
+    [StaticConstructorOnStartup]
+    internal static class BioReactorPatches
+    {
+        static BioReactorPatches()
+        {
+            HarmonyInstance harmonyInstance = HarmonyInstance.Create("com.BioReactor.rimworld.mod");
+            harmonyInstance.PatchAll(Assembly.GetExecutingAssembly());
+        }
+    }
+
+    [HarmonyPatch(typeof(FloatMenuMakerMap)), HarmonyPatch("AddHumanlikeOrders")]
+    internal class FloatMenuMakerMapPatches
+    {
+        [HarmonyPrefix]
+        static bool Prefix_AddHumanlikeOrders(Vector3 clickPos, Pawn pawn, List<FloatMenuOption> opts)
+        {
+            if (pawn.health.capacities.CapableOf(PawnCapacityDefOf.Manipulation))
+            {
+                foreach (LocalTargetInfo localTargetInfo3 in GenUI.TargetsAt(clickPos, TargetingParameters.ForRescue(pawn), true))
+                {
+                    LocalTargetInfo localTargetInfo4 = localTargetInfo3;
+                    Pawn victim = (Pawn)localTargetInfo4.Thing;
+                    if (victim.Downed && pawn.CanReserveAndReach(victim, PathEndMode.OnCell, Danger.Deadly, 1, -1, null, true) && Building_BioReactor.FindBioReactorFor(victim, pawn, true) != null)
+                    {
+                        string text4 = "CarryToBioReactor".Translate(localTargetInfo4.Thing.LabelCap, localTargetInfo4.Thing);
+                        JobDef jDef = Bio_JobDefOf.CarryToBioReactor;
+                        Action action3 = delegate ()
+                        {
+                            Building_BioReactor building_BioReactor = Building_BioReactor.FindBioReactorFor(victim, pawn, false);
+                            if (building_BioReactor == null)
+                            {
+                                building_BioReactor = Building_BioReactor.FindBioReactorFor(victim, pawn, true);
+                            }
+                            if (building_BioReactor == null)
+                            {
+                                Messages.Message("CannotCarryToBioReactor".Translate() + ": " + "NoBioReactor".Translate(), victim, MessageTypeDefOf.RejectInput, false);
+                                return;
+                            }
+                            Job job = new Job(jDef, victim, building_BioReactor);
+                            job.count = 1;
+                            pawn.jobs.TryTakeOrderedJob(job, JobTag.Misc);
+                        };
+                        string label = text4;
+                        Action action2 = action3;
+                        Pawn revalidateClickTarget = victim;
+                        opts.Add(FloatMenuUtility.DecoratePrioritizedTask(new FloatMenuOption(label, action2, MenuOptionPriority.Default, null, revalidateClickTarget, 0f, null, null), pawn, victim, "ReservedBy"));
+                    }
+                }
+            }
+            return true;
+        }
+    }
+    [HarmonyPatch(typeof(ThingOwnerUtility))]
+    [HarmonyPatch("ContentsSuspended")]
+    internal class ThingOwnerUtilityPatches
+    {
+        [HarmonyPrefix]
+        public static bool Prefix_ContentsSuspended(ref bool __result, IThingHolder holder)
+        {
+            while (holder != null)
+            {
+                if (holder is Building_BioReactor || holder is Building_CryptosleepCasket || holder is ImportantPawnComp)
+                {
+                    Log.Message(holder.ToString());
+                    __result = true;
+                    return false;
+                }
+                holder = holder.ParentHolder;
+            }
+            __result = false;
+            return false;
+        }
+    }
 }
