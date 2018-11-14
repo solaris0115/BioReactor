@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+
+  <BioReactor.label>Bio Reactor</BioReactor.label>
+  <BioReactor.description>It is a bioreactor. It draws energy from living life.The amount of Nutrio to be injected into the living body is necessary.</BioReactor.description>
+  <BioReactor_Blueprint.label>Bio Reactor (blueprint)</BioReactor_Blueprint.label>
+  <BioReactor_Frame.label>Bio Reactor (building)</BioReactor_Frame.label>
+  <BioReactor_Frame.description>Living Battery</BioReactor_Frame.description>
+
+
+</LanguageData>

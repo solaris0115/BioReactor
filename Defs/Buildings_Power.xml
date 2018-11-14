@@ -4,7 +4,7 @@
 	<ThingDef ParentName="BuildingBase">
 		<defName>BioReactor</defName>
 		<label>Bio Reactor</label>
-		<description>Living Battery</description>
+		<description>It is a bioreactor. It draws energy from living life.The amount of Nutrio to be injected into the living body is necessary.</description>
 		<thingClass>BioReactor.Building_BioReactor</thingClass>
 		<graphicData>
 			<texPath>Things/Building/cell3</texPath>
@@ -23,7 +23,7 @@
 		<canOverlapZones>false</canOverlapZones>
 		<statBases>
 			<WorkToBuild>3200</WorkToBuild>
-			<MaxHitPoints>250</MaxHitPoints>
+			<MaxHitPoints>150</MaxHitPoints>
 			<Flammability>0.2</Flammability>
 		</statBases>
 		<tickerType>Normal</tickerType>
@@ -36,20 +36,18 @@
 			<ai_chillDestination>false</ai_chillDestination>
 		</building>
 		<costList>
-			<Steel>180</Steel>
-			<Uranium>5</Uranium>
+			<Steel>120</Steel>
 			<ComponentIndustrial>4</ComponentIndustrial>
-			<ComponentSpacer>1</ComponentSpacer>
 		</costList>
 		<comps>
 			<li Class="CompProperties_Power">
 				<compClass>BioReactor.CompBioPowerPlant</compClass>
-				<basePowerConsumption>-1000</basePowerConsumption>
+				<basePowerConsumption>-1400</basePowerConsumption>
 				<transmitsPower>true</transmitsPower>
 			</li>
 			<li Class="CompProperties_Flickable" />
 			<li Class="CompProperties_Refuelable">
-				<fuelConsumptionRate>2.0</fuelConsumptionRate>
+				<fuelConsumptionRate>8.0</fuelConsumptionRate>
 				<fuelCapacity>75.0</fuelCapacity>
 				<fuelFilter>
 					<categories>
@@ -61,10 +59,6 @@
 				<glowRadius>4</glowRadius>
 				<glowColor>(123,255,233,0)</glowColor>
 			</li>
-			<!-- <li Class="CompProperties_HeatPusher"> -->
-			<!-- <compClass>CompHeatPusherPowered</compClass> -->
-			<!-- <heatPerSecond>6</heatPerSecond> -->
-			<!-- </li> -->
 			<li Class="CompProperties_Breakdownable"/>
 			<li Class="CompProperties_Explosive">
 				<explosiveRadius>2.66</explosiveRadius>
@@ -84,13 +78,12 @@
 		<terrainAffordanceNeeded>Medium</terrainAffordanceNeeded>
 		<constructionSkillPrerequisite>8</constructionSkillPrerequisite>
 		<researchPrerequisites>
-			<li>Cryptosleep</li>
+			<li>BiofuelRefining</li>
 		</researchPrerequisites>
 		<destroyable>true</destroyable>
 		<rotatable>false</rotatable>
 	</ThingDef>
 
-	
 	<JobDef>
 		<defName>CarryToBioReactor</defName>
 		<driverClass>BioReactor.JobDriver_CarryToBioReactor</driverClass>
@@ -98,8 +91,7 @@
 		<casualInterruptible>false</casualInterruptible>
 		<taleOnCompletion>PutIntoBioReactor</taleOnCompletion>
 	</JobDef>
-	
-	
+
 	<JobDef>
 		<defName>EnterBioReactor</defName>
 		<driverClass>BioReactor.JobDriver_EnterBioReactor</driverClass>
@@ -107,8 +99,7 @@
 		<taleOnCompletion>EnteredBioReactor</taleOnCompletion>
 		<allowOpportunisticPrefix>true</allowOpportunisticPrefix>
 	</JobDef>
-	
-	
+
 	<TaleDef>
 		<defName>PutIntoBioReactor</defName>
 		<label>put into BioReactor</label>
@@ -137,32 +128,62 @@
 			</rulesStrings>
 		</rulePack>
 	</TaleDef>
-	
-	<TaleDef>
-    <defName>EnteredBioReactor</defName>
-    <label>entered BioReactor</label>
-    <taleClass>Tale_SinglePawn</taleClass>
-    <type>Volatile</type>
-    <baseInterest>5</baseInterest>
-    <rulePack>
-      <rulesStrings>
-        <li>tale_noun->[PAWN_nameDef] entering BioReactor</li>
-        <li>image->[PAWN_nameFull] put in to BioReactor [circumstance_group]</li>
-        <li>image->[PAWN_nameFull] opening an empty BioReactor [circumstance_group]</li>
-        <li>image->[PAWN_nameFull] sealing themselves inside a BioReactor [circumstance_group]</li>
-        <li>image->[PAWN_nameFull] looking through the wall of a BioReactor at a world they're about to leave [circumstance_group]</li>
-        <li>circumstance_phrase->with a [AdjectiveAngsty] expression</li>
-        <li>circumstance_phrase->while consumed in thought</li>
-        <li>circumstance_phrase->while gazing at a faraway [TerrainFeature]</li>
-        <li>circumstance_phrase->and talking quietly to themselves</li>
-        <li>desc_sentence->[Quantity_adjphrase] [Animal]s rest near the scene.</li>
-        <li>desc_sentence->[Quantity_adjphrase] [Enemy]s approach the area.</li>
-        <li>desc_sentence->[PAWN_nameDef] radiates determination.</li>
-        <li>desc_sentence->[PAWN_nameDef] is visibly wounded.</li>
-        <li>desc_sentence->A [Color] aurora shines in the background.</li>
-        <li>desc_sentence->[Quantity_adjphrase] filled BioReactor surround the scene.</li>
-      </rulesStrings>
-    </rulePack>
-  </TaleDef>
 
+	<TaleDef>
+		<defName>EnteredBioReactor</defName>
+		<label>entered BioReactor</label>
+		<taleClass>Tale_SinglePawn</taleClass>
+		<type>Volatile</type>
+		<baseInterest>5</baseInterest>
+		<rulePack>
+			<rulesStrings>
+				<li>tale_noun->[PAWN_nameDef] entering BioReactor</li>
+				<li>image->[PAWN_nameFull] put in to BioReactor [circumstance_group]</li>
+				<li>image->[PAWN_nameFull] opening an empty BioReactor [circumstance_group]</li>
+				<li>image->[PAWN_nameFull] sealing themselves inside a BioReactor [circumstance_group]</li>
+				<li>image->[PAWN_nameFull] looking through the wall of a BioReactor at a world they're about to leave [circumstance_group]</li>
+				<li>circumstance_phrase->with a [AdjectiveAngsty] expression</li>
+				<li>circumstance_phrase->while consumed in thought</li>
+				<li>circumstance_phrase->while gazing at a faraway [TerrainFeature]</li>
+				<li>circumstance_phrase->and talking quietly to themselves</li>
+				<li>desc_sentence->[Quantity_adjphrase] [Animal]s rest near the scene.</li>
+				<li>desc_sentence->[Quantity_adjphrase] [Enemy]s approach the area.</li>
+				<li>desc_sentence->[PAWN_nameDef] radiates determination.</li>
+				<li>desc_sentence->[PAWN_nameDef] is visibly wounded.</li>
+				<li>desc_sentence->A [Color] aurora shines in the background.</li>
+				<li>desc_sentence->[Quantity_adjphrase] filled BioReactor surround the scene.</li>
+			</rulesStrings>
+		</rulePack>
+	</TaleDef>
+
+	<ThoughtDef>
+		<defName>KnowHistolysisHumanlike</defName>
+		<durationDays>6</durationDays>
+		<stackLimit>5</stackLimit>
+		<nullifyingTraits>
+			<li>Psychopath</li>
+			<li>Bloodlust</li>
+			<li>Cannibal</li>
+		</nullifyingTraits>
+		<stages>
+			<li>
+				<label>We melted human alive.</label>
+				<description>A living person melted alive.Just melted it!!</description>
+				<baseMoodEffect>-6</baseMoodEffect>
+			</li>
+		</stages>
+	</ThoughtDef>
+	<ThoughtDef>
+		<defName>LivingBattery</defName>
+		<durationDays>2</durationDays>
+		<stackLimit>1</stackLimit>
+		<stages>
+			<li>
+				<label>I became Living battery.</label>
+				<description>I became living battery alive. I Don't want to go back there.</description>
+				<baseMoodEffect>-4</baseMoodEffect>
+			</li>
+		</stages>
+	</ThoughtDef>
 </Defs>
+

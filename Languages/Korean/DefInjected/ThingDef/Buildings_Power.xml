@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+
+  <BioReactor.label>바이오리액터</BioReactor.label>
+  <BioReactor.description>생명체로부터 에너지를 추출하는 장치입니다. 살아있는 생명체가 죽지 않도록 에너지를 주입해야합니다.</BioReactor.description>
+  <BioReactor_Blueprint.label>바이오리액터 (blueprint)</BioReactor_Blueprint.label>
+  <BioReactor_Frame.label>바이오리액터 (building)</BioReactor_Frame.label>
+  <BioReactor_Frame.description>생명체로부터 에너지를 추출하는 장치입니다. 살아있는 생명체가 죽지 않도록 에너지를 주입해야합니다.</BioReactor_Frame.description>
+
+
+</LanguageData>

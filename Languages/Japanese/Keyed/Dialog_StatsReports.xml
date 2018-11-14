@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
-  <EnterBioReactor>Enter BioReactor</EnterBioReactor>
+  <EnterBioReactor>Enter BioReactor casket</EnterBioReactor>
   <Histolysis>Histolysis</Histolysis>
   <HistolysisDesc>The living objects are melted in the reactor and replaced to biofuel.</HistolysisDesc>
   <CarryToBioReactor>Carry {1_label} to BioReactor</CarryToBioReactor>

@@ -15,7 +15,7 @@ namespace BioReactor
 {
     public class CompBioPowerPlant : CompPowerPlant
     {
-        public Building_Casket building_BioReactor;
+        public Building_BioReactor building_BioReactor;
         public CompRefuelable compRefuelable;
 
         protected override float DesiredPowerOutput
@@ -29,7 +29,7 @@ namespace BioReactor
         public override void PostSpawnSetup(bool respawningAfterLoad)
         {
             base.PostSpawnSetup(respawningAfterLoad);
-            building_BioReactor = (Building_Casket)parent;
+            building_BioReactor = (Building_BioReactor)parent;
             compRefuelable = parent.GetComp<CompRefuelable>();
         }
 
@@ -41,62 +41,29 @@ namespace BioReactor
 
         public new void UpdateDesiredPowerOutput()
         {
-            if ((building_BioReactor != null && !building_BioReactor.HasAnyContents) || (this.breakdownableComp != null && this.breakdownableComp.BrokenDown) || (this.refuelableComp != null && !this.refuelableComp.HasFuel) || (this.flickableComp != null && !this.flickableComp.SwitchIsOn) || !base.PowerOn)
+            if ((building_BioReactor != null && !(building_BioReactor.state == Building_BioReactor.ReactorState.Full)) || (this.breakdownableComp != null && this.breakdownableComp.BrokenDown) || (this.refuelableComp != null && !this.refuelableComp.HasFuel) || (this.flickableComp != null && !this.flickableComp.SwitchIsOn) || !base.PowerOn)
             {
                 base.PowerOutput = 0f;
             }
             else
             {
+                
                 Pawn pawn = building_BioReactor.ContainedThing as Pawn;
                 if (pawn != null)
                 {
-                    if (pawn.Dead)
+                    if (pawn.Dead||(pawn.RaceProps.FleshType == FleshTypeDefOf.Mechanoid))
                     {
                         PowerOutput = 0;
                         return;
                     }
-                }
-                base.PowerOutput = this.DesiredPowerOutput;
-            }
-        }
-
-        public override IEnumerable<Gizmo> CompGetGizmosExtra()
-        {
-            foreach (Gizmo c in base.CompGetGizmosExtra())
-            {
-                yield return c;
-            }
-            if (building_BioReactor.HasAnyContents)
-            {
-                Pawn pawn = building_BioReactor.ContainedThing as Pawn;
-                if (pawn != null)
-                {
-                    yield return new Command_Action
+                    if ((pawn.RaceProps.Humanlike))
                     {
-                        defaultLabel = "Histolysis".Translate(),
-                        defaultDesc = "HistolysisDesc".Translate(),
-                        icon = ContentFinder<Texture2D>.Get("UI/Commands/Histolysis", true),
-                        action = delegate ()
-                        {
-                            compRefuelable.Refuel(100);
-                            DamageInfo d = new DamageInfo();
-                            d.Def = DamageDefOf.Burn;
-                            d.SetAmount(1000);
-                            pawn.Kill(d);
-                            try
-                            {
-                                CompRottable compRottable = building_BioReactor.ContainedThing.TryGetComp<CompRottable>();
-                                if (compRottable != null)
-                                {
-                                    compRottable.RotProgress += 600000f;
-                                }
-                            }
-                            catch (Exception ee)
-                            {
-                                Log.Message("Rot Error" + ee);
-                            }
-                        }
-                    };
+                        PowerOutput = DesiredPowerOutput;
+                    }
+                    else if ((pawn.RaceProps.FleshType == FleshTypeDefOf.Normal))
+                    {
+                        PowerOutput = this.DesiredPowerOutput * 0.75f;
+                    }
                 }
             }
         }
@@ -162,9 +129,52 @@ namespace BioReactor
 
         }
     }
+    /*public class CompBioGlower : CompGlower
+      {
+          public override void ReceiveCompSignal(string signal)
+          {
+              if (signal == "PowerTurnedOn" || signal == "PowerTurnedOff" || signal == "FlickedOn" || signal == "FlickedOff" || signal == "Refueled" || signal == "RanOutOfFuel" || signal == "ScheduledOn" || signal == "ScheduledOff")
+              {
+                  this.UpdateLit(this.parent.Map);
+              }
+          }
+      }
+      public class CompProperties_BioGlower : CompProperties_Glower
+      {
+          public ColorInt glowColor2 = new ColorInt(255, 255, 255, 0) * 1.45f;
+
+          public CompProperties_BioGlower()
+          {
+              this.compClass = typeof(CompBioGlower);
+          }
+      }*/
 
     public class Building_BioReactor : Building_Casket
     {
+        public enum ReactorState
+        {
+            Empty,//none
+            StartFilling,//animating Filling
+            Full,//Just Drawing
+            HistolysisStating,//Start Animating and Changing Color
+            HistolysisEnding,
+            HistolysisDone//Just Drawing
+        }
+        public ReactorState state = ReactorState.Empty;
+        public float fillpct;
+        public float histolysisPct = 0;
+
+        public CompRefuelable compRefuelable;
+
+
+        public override void SpawnSetup(Map map, bool respawningAfterLoad)
+        {
+            base.SpawnSetup(map, respawningAfterLoad);
+            compRefuelable = GetComp<CompRefuelable>();
+            fillpct = 0;
+            histolysisPct = 0;
+        }
+
         public override bool TryAcceptThing(Thing thing, bool allowSpecialEffects = true)
         {
             if (base.TryAcceptThing(thing, allowSpecialEffects))
@@ -172,6 +182,12 @@ namespace BioReactor
                 if (allowSpecialEffects)
                 {
                     SoundDefOf.CryptosleepCasket_Accept.PlayOneShot(new TargetInfo(base.Position, base.Map, false));
+                }
+                state = ReactorState.StartFilling;
+                Pawn pawn = thing as Pawn;
+                if(pawn !=null && pawn.RaceProps.Humanlike)
+                {
+                    pawn.needs.mood.thoughts.memories.TryGainMemory(BioReactorThoughtDef.LivingBattery, null);
                 }
                 return true;
             }
@@ -212,19 +228,30 @@ namespace BioReactor
             {
                 yield return c;
             }
-            if (base.Faction == Faction.OfPlayer && this.innerContainer.Count > 0 && this.def.building.isPlayerEjectable)
+            if (HasAnyContents)
             {
-                Command_Action eject = new Command_Action();
-                eject.action = new Action(EjectContents);
-                eject.defaultLabel = "CommandPodEject".Translate();
-                eject.defaultDesc = "CommandPodEjectDesc".Translate();
-                if (this.innerContainer.Count == 0)
+                Pawn pawn = ContainedThing as Pawn;
+                if (pawn != null)
                 {
-                    eject.Disable("CommandPodEjectFailEmpty".Translate());
+                    if (pawn.RaceProps.FleshType == FleshTypeDefOf.Normal || pawn.RaceProps.FleshType == FleshTypeDefOf.Insectoid)
+                    {
+                        if (state == ReactorState.Full)
+                        {
+                            yield return new Command_Action
+                            {
+                                defaultLabel = "Histolysis".Translate(),
+                                defaultDesc = "HistolysisDesc".Translate(),
+                                icon = ContentFinder<Texture2D>.Get("UI/Commands/Histolysis", true),
+                                action = delegate ()
+                                {
+                                    BioReactorSoundDef.Drowning.PlayOneShot(new TargetInfo(base.Position, base.Map, false));
+                                    state = ReactorState.HistolysisStating;
+                                }
+                            };
+                        }
+                    }                    
+
                 }
-                eject.hotKey = KeyBindingDefOf.Misc1;
-                eject.icon = ContentFinder<Texture2D>.Get("UI/Commands/PodEject", true);
-                yield return eject;
             }
             yield break;
         }
@@ -249,7 +276,61 @@ namespace BioReactor
             {
                 SoundDefOf.CryptosleepCasket_Eject.PlayOneShot(SoundInfo.InMap(new TargetInfo(base.Position, base.Map, false), MaintenanceType.None));
             }
+            state = ReactorState.Empty;
             base.EjectContents();
+        }
+
+        public override void ExposeData()
+        {
+            base.ExposeData();
+            Scribe_Values.Look<ReactorState>(ref state, "state");
+            Scribe_Values.Look<float>(ref fillpct, "fillpct");
+            Scribe_Values.Look<float>(ref histolysisPct, "histolysisPct");
+        }
+        public virtual void Histolysis()
+        {
+            if (HasAnyContents)
+            {
+                Pawn pawn = ContainedThing as Pawn;
+                if (pawn != null)
+                {
+                    compRefuelable.Refuel(35);
+                    DamageInfo d = new DamageInfo();
+                    d.Def = DamageDefOf.Burn;
+                    d.SetAmount(1000);
+                    pawn.Kill(d);
+                    try
+                    {
+                        CompRottable compRottable = ContainedThing.TryGetComp<CompRottable>();
+                        if (compRottable != null)
+                        {
+                            compRottable.RotProgress += 600000f;
+                        }
+                        MakeFuel();
+                    }
+                    catch (Exception ee)
+                    {
+                        Log.Message("Rot Error" + ee);
+                    }
+                    if (pawn.RaceProps.Humanlike)
+                    {
+                        foreach (Pawn p in this.Map.mapPawns.SpawnedPawnsInFaction(Faction))
+                        {
+                            if (p.needs != null && p.needs.mood != null && p.needs.mood.thoughts != null)
+                            {
+                                p.needs.mood.thoughts.memories.TryGainMemory(BioReactorThoughtDef.KnowHistolysisHumanlike, null);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        public void MakeFuel()
+        {
+            ThingDef stuff = GenStuff.RandomStuffFor(ThingDefOf.Chemfuel);
+            Thing thing = ThingMaker.MakeThing(ThingDefOf.Chemfuel, stuff);
+            thing.stackCount = 35;
+            GenPlace.TryPlaceThing(thing, Position, Find.CurrentMap, ThingPlaceMode.Near, null, null);
         }
 
         public static Building_BioReactor FindBioReactorFor(Pawn p, Pawn traveler, bool ignoreOtherReservations = false)
@@ -283,43 +364,114 @@ namespace BioReactor
             return null;
         }
 
+        public override void Tick()
+        {
+            base.Tick();
+            switch (state)
+            {
+                case ReactorState.Empty:
+                    break;
+                case ReactorState.StartFilling:
+                    fillpct += 0.01f;
+                    if (fillpct >= 1)
+                    {
+                        state = ReactorState.Full;
+                        fillpct = 0;
+                        BioReactorSoundDef.Drowning.PlayOneShot(new TargetInfo(base.Position, base.Map, false));
+                    }
+                    break;
+                case ReactorState.Full:
+                    break;
+                case ReactorState.HistolysisStating:
+                    histolysisPct += 0.005f;
+                    if (histolysisPct >= 1)
+                    {
+                        state = ReactorState.HistolysisEnding;
+                        Histolysis();
+                    }
+                    break;
+                case ReactorState.HistolysisEnding:
+                    histolysisPct -= 0.01f;
+                    if (histolysisPct <= 0)
+                    {
+                        histolysisPct = 0;
+                        state = ReactorState.HistolysisDone;
+                    }
+                    break;
+                case ReactorState.HistolysisDone:
+                    break;
+            }
+        }
+
         public override void Draw()
         {
-            foreach (Thing t in innerContainer)
+            switch (state)
             {
-                Pawn pawn = t as Pawn;
-                if (pawn != null)
-                {
-                    DrawInnerThing(pawn, DrawPos + new Vector3(0, -0.05f, 0.65f), 1.7f, true, Rot4.South, Rot4.South, RotDrawMode.Fresh, false, false);
-                    GenDraw.FillableBarRequest r = default(GenDraw.FillableBarRequest);
-                    r.center = this.DrawPos + new Vector3(0, -0.02f, 0.65f);
-                    r.size = new Vector2(1.6f, 1.2f);
-                    r.fillPercent = 1;
-                    r.filledMat = SolidColorMaterials.SimpleSolidColorMaterial(new Color32(123, 255, 233, 75), false);
-                    r.unfilledMat = SolidColorMaterials.SimpleSolidColorMaterial(new Color32(0, 0, 0, 0), false);
-                    r.margin = 0f;
-                    Rot4 rotation = Rotation;
-                    rotation.Rotate(RotationDirection.Clockwise);
-                    r.rotation = rotation;
-                    GenDraw.DrawFillableBar(r);
-                }
-                else
-                {
-                    t.DrawAt(DrawPos + new Vector3(0, -0.05f, 0.65f));
-                    GenDraw.FillableBarRequest r = default(GenDraw.FillableBarRequest);
-                    r.center = this.DrawPos + new Vector3(0, -0.02f, 0.65f);
-                    r.size = new Vector2(1.6f, 1.2f);
-                    r.fillPercent = 1;
-                    r.filledMat = SolidColorMaterials.SimpleSolidColorMaterial(new Color32(200, 45, 45, 75), false);
-                    r.unfilledMat = SolidColorMaterials.SimpleSolidColorMaterial(new Color32(0, 0, 0, 0), false);
-                    r.margin = 0.15f;
-                    Rot4 rotation = Rotation;
-                    rotation.Rotate(RotationDirection.Clockwise);
-                    r.rotation = rotation;
-                    GenDraw.DrawFillableBar(r);
-                }
+                case ReactorState.Empty:
+                    break;
+                case ReactorState.StartFilling:
+                    foreach (Thing t in innerContainer)
+                    {
+                        Pawn pawn = t as Pawn;
+                        if (pawn != null)
+                        {
+                            DrawInnerThing(pawn, DrawPos + new Vector3(0, -0.05f, 0.65f), 1.7f, true, Rot4.South, Rot4.South, RotDrawMode.Fresh, false, false);
+                            LiquidDraw(new Color32(123, 255, 233, 75), fillpct);
+                        }
+                    }
+                    break;
+                case ReactorState.Full:
+                    foreach (Thing t in innerContainer)
+                    {
+                        Pawn pawn = t as Pawn;
+                        if (pawn != null)
+                        {
+                            DrawInnerThing(pawn, DrawPos + new Vector3(0, -0.05f, 0.65f), 1.7f, true, Rot4.South, Rot4.South, RotDrawMode.Fresh, false, false);
+                            LiquidDraw(new Color32(123, 255, 233, 75), 1);
+                        }
+                    }
+                    break;
+                case ReactorState.HistolysisStating:
+                    foreach (Thing t in innerContainer)
+                    {
+                        Pawn pawn = t as Pawn;
+                        if (pawn != null)
+                        {
+                            DrawInnerThing(pawn, DrawPos + new Vector3(0, -0.05f, 0.65f), 1.7f, true, Rot4.South, Rot4.South, RotDrawMode.Fresh, false, false);
+                            LiquidDraw(new Color(0.48f + (0.2f * histolysisPct), 1 - (0.7f * histolysisPct), 0.9f - (0.6f * histolysisPct), 0.3f + histolysisPct * 0.55f), 1);
+                        }
+                    }
+                    break;
+                case ReactorState.HistolysisEnding:
+                    foreach (Thing t in innerContainer)
+                    {
+                        t.DrawAt(DrawPos + new Vector3(0, -0.05f, 0.65f));
+                        LiquidDraw(new Color(0.7f, 0.2f, 0.2f, 0.4f + (0.45f * histolysisPct)), 1);
+                    }
+                    break;
+                case ReactorState.HistolysisDone:
+                    foreach (Thing t in innerContainer)
+                    {
+                        t.DrawAt(DrawPos + new Vector3(0, -0.05f, 0.65f));
+                        LiquidDraw(new Color(0.7f, 0.3f, 0.3f, 0.4f), 1);
+                    }
+                    break;
             }
             base.Draw();
+        }
+        public virtual void LiquidDraw(Color color, float fillPct)
+        {
+            GenDraw.FillableBarRequest r = default(GenDraw.FillableBarRequest);
+            r.center = this.DrawPos + new Vector3(0, -0.02f, 0.65f);
+            r.size = new Vector2(1.6f, 1.18f);
+            r.fillPercent = fillPct;
+            r.filledMat = SolidColorMaterials.SimpleSolidColorMaterial(color, false);
+            r.unfilledMat = SolidColorMaterials.SimpleSolidColorMaterial(new Color(0, 0, 0, 0), false);
+            r.margin = 0f;
+            Rot4 rotation = Rotation;
+            rotation.Rotate(RotationDirection.Clockwise);
+            r.rotation = rotation;
+            GenDraw.DrawFillableBar(r);
         }
         public virtual void DrawInnerThing(Pawn pawn, Vector3 rootLoc, float angle, bool renderBody, Rot4 bodyFacing, Rot4 headFacing, RotDrawMode bodyDrawType, bool portrait, bool headStump)
         {
@@ -646,7 +798,6 @@ namespace BioReactor
             {
                 if (holder is Building_BioReactor || holder is Building_CryptosleepCasket || holder is ImportantPawnComp)
                 {
-                    Log.Message(holder.ToString());
                     __result = true;
                     return false;
                 }
@@ -655,5 +806,18 @@ namespace BioReactor
             __result = false;
             return false;
         }
+    }
+
+    [DefOf]
+    public static class BioReactorSoundDef
+    {
+        public static SoundDef Drowning;
+    }
+    [DefOf]
+    public static class BioReactorThoughtDef
+    {
+        public static ThoughtDef KnowHistolysisHumanlike;
+
+        public static ThoughtDef LivingBattery;
     }
 }
