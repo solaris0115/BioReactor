@@ -1,8 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
 
-  <KnowHistolysisHumanlike.stages.0.label>We melted human alive.</KnowHistolysisHumanlike.stages.0.label>
-  <KnowHistolysisHumanlike.stages.0.description>A living person melted alive.Just melted it!!</KnowHistolysisHumanlike.stages.0.description>
+  <KnowHistolysisHumanlike.stages.0.label>사람을 산채로 녹였어.</KnowHistolysisHumanlike.stages.0.label>
+  <KnowHistolysisHumanlike.stages.0.description>살아있는 사람을 산채로 녹여버렸어. 산채로 녹아버렸다고!!</KnowHistolysisHumanlike.stages.0.description>
+
+  <LivingBattery.stages.0.label>생체 배터리가 되었어.</LivingBattery.stages.0.label>
+  <LivingBattery.stages.0.description>생체 배터리가 되었었어. 다시 그곳에 들어가고 싶지 않아.</LivingBattery.stages.0.description>
 
 
 </LanguageData>

@@ -60,7 +60,7 @@ namespace BioReactor
                     {
                         PowerOutput = DesiredPowerOutput;
                     }
-                    else if ((pawn.RaceProps.FleshType == FleshTypeDefOf.Normal))
+                    else
                     {
                         PowerOutput = this.DesiredPowerOutput * 0.75f;
                     }
