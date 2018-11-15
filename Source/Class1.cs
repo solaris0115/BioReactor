@@ -166,6 +166,38 @@ namespace BioReactor
 
         public CompRefuelable compRefuelable;
 
+        public bool IsContainingThingPawn
+        {
+            get
+            {
+                if(!HasAnyContents)
+                {
+                    return false;
+                }
+                Pawn pawn = ContainedThing as Pawn;
+                if(pawn !=null)
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
+        public Pawn InnerPawn
+        {
+            get
+            {
+                if (!HasAnyContents)
+                {
+                    return null;
+                }
+                Pawn pawn = ContainedThing as Pawn;
+                if (pawn != null)
+                {
+                    return pawn;
+                }
+                return null;
+            }
+        }
 
         public override void SpawnSetup(Map map, bool respawningAfterLoad)
         {
@@ -728,6 +760,34 @@ namespace BioReactor
             yield break;
         }
     }
+
+    [StaticConstructorOnStartup]
+    public class CompBioRefuelable : CompRefuelable
+    {
+        CompFlickable flickComp;
+        Building_BioReactor bioReactor;
+        public override void PostSpawnSetup(bool respawningAfterLoad)
+        {
+            base.PostSpawnSetup(respawningAfterLoad);
+            flickComp = parent.GetComp<CompFlickable>();
+            bioReactor =(Building_BioReactor)parent;
+        }
+        public override void CompTick()
+        {
+            if (!this.Props.consumeFuelOnlyWhenUsed && (this.flickComp == null || this.flickComp.SwitchIsOn) && (bioReactor !=null && (bioReactor.InnerPawn!=null)))
+            {
+                this.ConsumeFuel(this.ConsumptionRatePerTick);
+            }
+        }
+        private float ConsumptionRatePerTick
+        {
+            get
+            {
+                return this.Props.fuelConsumptionRate / 60000f;
+            }
+        }
+    }
+
 
     [DefOf]
     public static class Bio_JobDefOf

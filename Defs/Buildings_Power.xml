@@ -47,6 +47,7 @@
 			</li>
 			<li Class="CompProperties_Flickable" />
 			<li Class="CompProperties_Refuelable">
+				<compClass>BioReactor.CompBioRefuelable</compClass>
 				<fuelConsumptionRate>8.0</fuelConsumptionRate>
 				<fuelCapacity>75.0</fuelCapacity>
 				<fuelFilter>
