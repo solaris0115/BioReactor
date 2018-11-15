@@ -168,8 +168,44 @@
 		<stages>
 			<li>
 				<label>We melted human alive.</label>
-				<description>A living person melted alive.Just melted it!!</description>
+				<description>A living person melted alive.Just melted i...urp..</description>
 				<baseMoodEffect>-6</baseMoodEffect>
+			</li>
+		</stages>
+	</ThoughtDef>
+	<ThoughtDef>
+		<defName>KnowHistolysisHumanlikeCannibal</defName>
+		<durationDays>0.5</durationDays>
+		<stackLimit>2</stackLimit>
+		<nullifyingTraits>
+			<li>Psychopath</li>
+			<li>Bloodlust</li>
+		</nullifyingTraits>
+		<requiredTraits>
+			<li>Cannibal</li>
+		</requiredTraits>
+		<stages>
+			<li>
+				<label>Disgusting</label>
+				<description>Seriously, It's killing my appetite.</description>
+				<baseMoodEffect>-4</baseMoodEffect>
+			</li>
+		</stages>
+	</ThoughtDef>
+	<ThoughtDef>
+		<defName>KnowHistolysisHumanlikePsychopath</defName>
+		<durationDays>3</durationDays>
+		<stackLimit>3</stackLimit>
+		<stackedEffectMultiplier>0.75</stackedEffectMultiplier>
+		<requiredTraits>
+			<li>Psychopath</li>
+			<li>Bloodlust</li>
+		</requiredTraits>
+		<stages>
+			<li>
+				<label>I saw people melting.</label>
+				<description>I saw it go back to the beginning... Beautiful.</description>
+				<baseMoodEffect>3</baseMoodEffect>
 			</li>
 		</stages>
 	</ThoughtDef>

@@ -319,6 +319,8 @@ namespace BioReactor
                             if (p.needs != null && p.needs.mood != null && p.needs.mood.thoughts != null)
                             {
                                 p.needs.mood.thoughts.memories.TryGainMemory(BioReactorThoughtDef.KnowHistolysisHumanlike, null);
+                                p.needs.mood.thoughts.memories.TryGainMemory(BioReactorThoughtDef.KnowHistolysisHumanlikeCannibal, null);
+                                p.needs.mood.thoughts.memories.TryGainMemory(BioReactorThoughtDef.KnowHistolysisHumanlikePsychopath, null);
                             }
                         }
                     }
@@ -817,6 +819,8 @@ namespace BioReactor
     public static class BioReactorThoughtDef
     {
         public static ThoughtDef KnowHistolysisHumanlike;
+        public static ThoughtDef KnowHistolysisHumanlikeCannibal;
+        public static ThoughtDef KnowHistolysisHumanlikePsychopath;
 
         public static ThoughtDef LivingBattery;
     }
