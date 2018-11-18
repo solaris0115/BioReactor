@@ -634,6 +634,11 @@ namespace BioReactor
         }
     }
 
+    public class BioReactorDef:ThingDef
+    {
+
+    }
+
     public class JobDriver_CarryToBioReactor : JobDriver
     {
         private const TargetIndex TakeeInd = TargetIndex.A;

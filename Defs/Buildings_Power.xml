@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
 
+	<!-- 2X2 Size -->
 	<ThingDef ParentName="BuildingBase">
 		<defName>BioReactor</defName>
 		<label>Bio Reactor</label>
@@ -47,7 +48,6 @@
 			</li>
 			<li Class="CompProperties_Flickable" />
 			<li Class="CompProperties_Refuelable">
-				<compClass>BioReactor.CompBioRefuelable</compClass>
 				<fuelConsumptionRate>8.0</fuelConsumptionRate>
 				<fuelCapacity>75.0</fuelCapacity>
 				<fuelFilter>
@@ -61,10 +61,6 @@
 				<glowColor>(123,255,233,0)</glowColor>
 			</li>
 			<li Class="CompProperties_Breakdownable"/>
-			<li Class="CompProperties_Explosive">
-				<explosiveRadius>2.66</explosiveRadius>
-				<explosiveDamageType>Flame</explosiveDamageType>
-			</li>
 			<li Class="BioReactor.CompProperties_SecondLayer">
 				<graphicData>
 					<texPath>Things/Building/floor</texPath>
@@ -72,7 +68,7 @@
 					<drawSize>(3.5,3.5)</drawSize>
 					<drawRotated>false</drawRotated>
 				</graphicData>
-				<offset>(0,0,0.5)</offset>
+				<offset>(0,0,0.55)</offset>
 				<altitudeLayer>LayingPawn</altitudeLayer>
 			</li>
 		</comps>
@@ -85,6 +81,90 @@
 		<rotatable>false</rotatable>
 	</ThingDef>
 
+	<!-- 3X3 Size -->
+	<!-- <ThingDef ParentName="BuildingBase"> -->
+		<!-- <defName>BioReactorBig</defName> -->
+		<!-- <label>Large Bio Reactor</label> -->
+		<!-- <description>It is a bioreactor. It draws energy from living life.The amount of Nutrio to be injected into the living body is necessary.</description> -->
+		<!-- <thingClass>BioReactor.Building_BioReactor</thingClass> -->
+		<!-- <graphicData> -->
+			<!-- <texPath>Things/Building/cell3</texPath> -->
+			<!-- <graphicClass>Graphic_Single</graphicClass> -->
+			<!-- <drawSize>(10, 10)</drawSize> -->
+			<!-- <drawRotated>false</drawRotated> -->
+		<!-- </graphicData> -->
+		<!-- <altitudeLayer>Pawn</altitudeLayer> -->
+		<!-- <passability>PassThroughOnly</passability> -->
+		<!-- <pathCost>25</pathCost> -->
+		<!-- <blockWind>true</blockWind> -->
+		<!-- <fillPercent>0.5</fillPercent> -->
+		<!-- <canOverlapZones>false</canOverlapZones> -->
+		<!-- <statBases> -->
+			<!-- <WorkToBuild>3200</WorkToBuild> -->
+			<!-- <MaxHitPoints>180</MaxHitPoints> -->
+			<!-- <Flammability>0.2</Flammability> -->
+		<!-- </statBases> -->
+		<!-- <tickerType>Normal</tickerType> -->
+		<!-- <size>(3,3)</size> -->
+		<!-- <designationCategory>Power</designationCategory> -->
+		<!-- <hasInteractionCell>true</hasInteractionCell> -->
+		<!-- <interactionCellOffset>(0,0,2)</interactionCellOffset> -->
+		<!-- <defaultPlacingRot>South</defaultPlacingRot> -->
+		<!-- <building> -->
+			<!-- <ai_chillDestination>false</ai_chillDestination> -->
+		<!-- </building> -->
+		<!-- <costList> -->
+			<!-- <Steel>200</Steel> -->
+			<!-- <ComponentIndustrial>6</ComponentIndustrial> -->
+		<!-- </costList> -->
+		<!-- <comps> -->
+			<!-- <li Class="CompProperties_Power"> -->
+				<!-- <compClass>BioReactor.CompBioPowerPlant</compClass> -->
+				<!-- <basePowerConsumption>-2400</basePowerConsumption> -->
+				<!-- <transmitsPower>true</transmitsPower> -->
+			<!-- </li> -->
+			<!-- <li Class="CompProperties_Flickable" /> -->
+			<!-- <li Class="CompProperties_Refuelable"> -->
+				<!-- <compClass>BioReactor.CompBioRefuelable</compClass> -->
+				<!-- <fuelConsumptionRate>8.0</fuelConsumptionRate> -->
+				<!-- <fuelCapacity>75.0</fuelCapacity> -->
+				<!-- <fuelFilter> -->
+					<!-- <categories> -->
+						<!-- <li>FoodRaw</li> -->
+					<!-- </categories> -->
+				<!-- </fuelFilter> -->
+			<!-- </li> -->
+			<!-- <li Class="CompProperties_Glower"> -->
+				<!-- <glowRadius>4</glowRadius> -->
+				<!-- <glowColor>(123,255,233,0)</glowColor> -->
+			<!-- </li> -->
+			<!-- <li Class="CompProperties_Breakdownable"/> -->
+			<!-- <li Class="CompProperties_Explosive"> -->
+				<!-- <explosiveRadius>2.66</explosiveRadius> -->
+				<!-- <explosiveDamageType>Flame</explosiveDamageType> -->
+			<!-- </li> -->
+			<!-- <li Class="BioReactor.CompProperties_SecondLayer"> -->
+				<!-- <graphicData> -->
+					<!-- <texPath>Things/Building/floor</texPath> -->
+					<!-- <graphicClass>Graphic_Single</graphicClass> -->
+					<!-- <drawSize>(3.5,3.5)</drawSize> -->
+					<!-- <drawRotated>false</drawRotated> -->
+				<!-- </graphicData> -->
+				<!-- <offset>(0,0,0.5)</offset> -->
+				<!-- <altitudeLayer>LayingPawn</altitudeLayer> -->
+			<!-- </li> -->
+		<!-- </comps> -->
+		<!-- <terrainAffordanceNeeded>Medium</terrainAffordanceNeeded> -->
+		<!-- <constructionSkillPrerequisite>8</constructionSkillPrerequisite> -->
+		<!-- <researchPrerequisites> -->
+			<!-- <li>BiofuelRefining</li> -->
+		<!-- </researchPrerequisites> -->
+		<!-- <destroyable>true</destroyable> -->
+		<!-- <rotatable>false</rotatable> -->
+	<!-- </ThingDef> -->
+
+	
+	
 	<JobDef>
 		<defName>CarryToBioReactor</defName>
 		<driverClass>BioReactor.JobDriver_CarryToBioReactor</driverClass>

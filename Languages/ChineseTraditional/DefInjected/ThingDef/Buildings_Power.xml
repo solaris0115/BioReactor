@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+
+  <BioReactor.label>生物電池</BioReactor.label>
+  <BioReactor.description>你有看過駭客任務嗎?歡迎回到母體。</BioReactor.description>
+  <BioReactor_Blueprint.label>Bio Reactor (blueprint)</BioReactor_Blueprint.label>
+  <BioReactor_Frame.label>Bio Reactor (building)</BioReactor_Frame.label>
+  <BioReactor_Frame.description>It is a bioreactor. It draws energy from living life.The amount of Nutrio to be injected into the living body is necessary.</BioReactor_Frame.description>
+
+
+</LanguageData>
