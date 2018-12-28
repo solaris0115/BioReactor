@@ -1,6 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
 
+  <!-- 4X4 Size -->
+
   <PutIntoBioReactor.label>바이오 리액터에 넣기</PutIntoBioReactor.label>
   <PutIntoBioReactor.rulePack.rulesStrings.0>tale_noun->[CARRIER_nameDef] putting [SLEEPER_nameDef] into BioReactor</PutIntoBioReactor.rulePack.rulesStrings.0>
   <PutIntoBioReactor.rulePack.rulesStrings.1>image->[CARRIER_nameFull] placing [SLEEPER_nameDef] inside a BioReactor [circumstance_group]</PutIntoBioReactor.rulePack.rulesStrings.1>

@@ -43,15 +43,14 @@ namespace BioReactor
         {
             if ((building_BioReactor != null && !(building_BioReactor.state == Building_BioReactor.ReactorState.Full)) || (this.breakdownableComp != null && this.breakdownableComp.BrokenDown) || (this.refuelableComp != null && !this.refuelableComp.HasFuel) || (this.flickableComp != null && !this.flickableComp.SwitchIsOn) || !base.PowerOn)
             {
-                base.PowerOutput = 0f;
+                PowerOutput = 0f;
             }
             else
             {
-                
                 Pawn pawn = building_BioReactor.ContainedThing as Pawn;
                 if (pawn != null)
                 {
-                    if (pawn.Dead||(pawn.RaceProps.FleshType == FleshTypeDefOf.Mechanoid))
+                    if (pawn.Dead || (pawn.RaceProps.FleshType == FleshTypeDefOf.Mechanoid))
                     {
                         PowerOutput = 0;
                         return;
@@ -62,8 +61,9 @@ namespace BioReactor
                     }
                     else
                     {
-                        PowerOutput = this.DesiredPowerOutput * 0.75f;
+                        PowerOutput = DesiredPowerOutput * 0.75f;
                     }
+                    PowerOutput *= pawn.BodySize;
                 }
             }
         }
@@ -129,28 +129,12 @@ namespace BioReactor
 
         }
     }
-    /*public class CompBioGlower : CompGlower
-      {
-          public override void ReceiveCompSignal(string signal)
-          {
-              if (signal == "PowerTurnedOn" || signal == "PowerTurnedOff" || signal == "FlickedOn" || signal == "FlickedOff" || signal == "Refueled" || signal == "RanOutOfFuel" || signal == "ScheduledOn" || signal == "ScheduledOff")
-              {
-                  this.UpdateLit(this.parent.Map);
-              }
-          }
-      }
-      public class CompProperties_BioGlower : CompProperties_Glower
-      {
-          public ColorInt glowColor2 = new ColorInt(255, 255, 255, 0) * 1.45f;
-
-          public CompProperties_BioGlower()
-          {
-              this.compClass = typeof(CompBioGlower);
-          }
-      }*/
 
     public class Building_BioReactor : Building_Casket
     {
+        public Vector3 innerDrawOffset;
+        public Vector3 waterDrawCenter;
+        public Vector2 waterDrawOffset;
         public enum ReactorState
         {
             Empty,//none
@@ -165,6 +149,7 @@ namespace BioReactor
         public float histolysisPct = 0;
 
         public CompRefuelable compRefuelable;
+        public CompForbiddable forbiddable;
 
         public bool IsContainingThingPawn
         {
@@ -203,8 +188,16 @@ namespace BioReactor
         {
             base.SpawnSetup(map, respawningAfterLoad);
             compRefuelable = GetComp<CompRefuelable>();
+            forbiddable = GetComp<CompForbiddable>();
             fillpct = 0;
             histolysisPct = 0;
+            BioReactorDef reactorDef = def as BioReactorDef;
+            if(reactorDef!=null)
+            {
+                innerDrawOffset = ((BioReactorDef)def).innerDrawOffset;
+                waterDrawCenter = ((BioReactorDef)def).waterDrawCenter;
+                waterDrawOffset = ((BioReactorDef)def).waterDrawOffset;
+            }
         }
 
         public override bool TryAcceptThing(Thing thing, bool allowSpecialEffects = true)
@@ -232,7 +225,7 @@ namespace BioReactor
             {
                 yield return o;
             }
-            if (this.innerContainer.Count == 0)
+            if (innerContainer.Count == 0)
             {
                 if (!myPawn.CanReach(this, PathEndMode.InteractionCell, Danger.Deadly, false, TraverseMode.ByPawn))
                 {
@@ -318,6 +311,22 @@ namespace BioReactor
             Scribe_Values.Look<ReactorState>(ref state, "state");
             Scribe_Values.Look<float>(ref fillpct, "fillpct");
             Scribe_Values.Look<float>(ref histolysisPct, "histolysisPct");
+            if(Scribe.mode == LoadSaveMode.PostLoadInit)
+            {
+                BioReactorDef reactorDef = def as BioReactorDef;
+                if (reactorDef != null)
+                {
+                    innerDrawOffset = ((BioReactorDef)def).innerDrawOffset;
+                    waterDrawCenter = ((BioReactorDef)def).waterDrawCenter;
+                    waterDrawOffset = ((BioReactorDef)def).waterDrawOffset;
+                }
+            }
+            compRefuelable = GetComp<CompRefuelable>();
+            forbiddable = GetComp<CompForbiddable>();
+        }
+        public override void PostMake()
+        {
+            base.PostMake();
         }
         public virtual void Histolysis()
         {
@@ -390,9 +399,12 @@ namespace BioReactor
                     }
                     return result;
                 }, null, 0, -1, false, RegionType.Set_Passable, false);
-                if (building_BioReactor != null)
+                if (building_BioReactor != null && !building_BioReactor.forbiddable.Forbidden)
                 {
-                    return building_BioReactor;
+                    if ((p.BodySize <= ((BioReactorDef)(building_BioReactor.def)).bodySizeMax) && (p.BodySize >= ((BioReactorDef)(building_BioReactor.def)).bodySizeMin))
+                    {
+                        return building_BioReactor;
+                    }
                 }
             }
             return null;
@@ -449,7 +461,7 @@ namespace BioReactor
                         Pawn pawn = t as Pawn;
                         if (pawn != null)
                         {
-                            DrawInnerThing(pawn, DrawPos + new Vector3(0, -0.05f, 0.65f), 1.7f, true, Rot4.South, Rot4.South, RotDrawMode.Fresh, false, false);
+                            DrawInnerThing(pawn, DrawPos + innerDrawOffset, 0, true, Rot4.South, Rot4.South, RotDrawMode.Fresh, false, false);
                             LiquidDraw(new Color32(123, 255, 233, 75), fillpct);
                         }
                     }
@@ -460,7 +472,7 @@ namespace BioReactor
                         Pawn pawn = t as Pawn;
                         if (pawn != null)
                         {
-                            DrawInnerThing(pawn, DrawPos + new Vector3(0, -0.05f, 0.65f), 1.7f, true, Rot4.South, Rot4.South, RotDrawMode.Fresh, false, false);
+                            DrawInnerThing(pawn, DrawPos + innerDrawOffset, 0, true, Rot4.South, Rot4.South, RotDrawMode.Fresh, false, false);
                             LiquidDraw(new Color32(123, 255, 233, 75), 1);
                         }
                     }
@@ -471,7 +483,7 @@ namespace BioReactor
                         Pawn pawn = t as Pawn;
                         if (pawn != null)
                         {
-                            DrawInnerThing(pawn, DrawPos + new Vector3(0, -0.05f, 0.65f), 1.7f, true, Rot4.South, Rot4.South, RotDrawMode.Fresh, false, false);
+                            DrawInnerThing(pawn, DrawPos + innerDrawOffset, 0, true, Rot4.South, Rot4.South, RotDrawMode.Fresh, false, false);
                             LiquidDraw(new Color(0.48f + (0.2f * histolysisPct), 1 - (0.7f * histolysisPct), 0.9f - (0.6f * histolysisPct), 0.3f + histolysisPct * 0.55f), 1);
                         }
                     }
@@ -479,14 +491,14 @@ namespace BioReactor
                 case ReactorState.HistolysisEnding:
                     foreach (Thing t in innerContainer)
                     {
-                        t.DrawAt(DrawPos + new Vector3(0, -0.05f, 0.65f));
+                        t.DrawAt(DrawPos + innerDrawOffset);
                         LiquidDraw(new Color(0.7f, 0.2f, 0.2f, 0.4f + (0.45f * histolysisPct)), 1);
                     }
                     break;
                 case ReactorState.HistolysisDone:
                     foreach (Thing t in innerContainer)
                     {
-                        t.DrawAt(DrawPos + new Vector3(0, -0.05f, 0.65f));
+                        t.DrawAt(DrawPos + innerDrawOffset);
                         LiquidDraw(new Color(0.7f, 0.3f, 0.3f, 0.4f), 1);
                     }
                     break;
@@ -496,8 +508,8 @@ namespace BioReactor
         public virtual void LiquidDraw(Color color, float fillPct)
         {
             GenDraw.FillableBarRequest r = default(GenDraw.FillableBarRequest);
-            r.center = this.DrawPos + new Vector3(0, -0.02f, 0.65f);
-            r.size = new Vector2(1.6f, 1.18f);
+            r.center = DrawPos + waterDrawCenter;
+            r.size = waterDrawOffset;
             r.fillPercent = fillPct;
             r.filledMat = SolidColorMaterials.SimpleSolidColorMaterial(color, false);
             r.unfilledMat = SolidColorMaterials.SimpleSolidColorMaterial(new Color(0, 0, 0, 0), false);
@@ -632,11 +644,16 @@ namespace BioReactor
                 bodyLoc.y += 0.04296875f;
             }
         }
+        
     }
 
     public class BioReactorDef:ThingDef
     {
-
+        public Vector3 innerDrawOffset;
+        public Vector3 waterDrawCenter;
+        public Vector2 waterDrawOffset;
+        public float bodySizeMin;
+        public float bodySizeMax;
     }
 
     public class JobDriver_CarryToBioReactor : JobDriver
@@ -766,6 +783,67 @@ namespace BioReactor
         }
     }
 
+   /* public class ITab_BioReactor : ITab
+    {
+        private const float TopAreaHeight = 35f;
+
+        private Vector2 scrollPosition = default(Vector2);
+
+        private static readonly Vector2 WinSize = new Vector2(300f, 480f);
+
+        private IStoreSettingsParent SelStoreSettingsParent
+        {
+            get
+            {
+                return (IStoreSettingsParent)SelObject;
+            }
+        }
+
+        public override bool IsVisible
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public ITab_BioReactor()
+        {
+            size = WinSize;
+            labelKey = "BioReactorTab";
+        }
+
+        protected override void FillTab()
+        {
+            Building_BioReactor thing = SelObject as Building_BioReactor;
+            CompRefuelable compRefuelable;
+            Rect rect = GenUI.ContractedBy(new Rect(0f, 0f, WinSize.x, WinSize.y), 10f);
+            GUI.BeginGroup(rect);
+            Text.Font = GameFont.Medium;
+            Text.Anchor = TextAnchor.MiddleCenter;
+            Widgets.Label(new Rect(rect)
+            {
+                height = 32f
+            }, Translator.Translate("BioReactorTitle"));
+            Text.Font = GameFont.Small;
+            Text.Anchor = TextAnchor.UpperLeft;
+            ThingFilter thingFilter;
+            if(thing !=null)
+            {
+                compRefuelable = thing.GetComp<CompRefuelable>();
+                if(compRefuelable !=null)
+                {
+                    thingFilter = compRefuelable.Props.fuelFilter;
+                    Rect rect2 = new Rect(0f, 40f, rect.width, rect.height - 40f);
+                    ThingFilterUI.DoThingFilterConfigWindow(rect2, ref scrollPosition, thing.filter, thingFilter, 8, null, null, false, null, null);
+                    PlayerKnowledgeDatabase.KnowledgeDemonstrated(ConceptDefOf.StorageTab, KnowledgeAmount.FrameDisplayed);
+                }
+            }
+           
+            GUI.EndGroup();
+        }
+    }*/
+
     [StaticConstructorOnStartup]
     public class CompBioRefuelable : CompRefuelable
     {
@@ -779,21 +857,19 @@ namespace BioReactor
         }
         public override void CompTick()
         {
-            if (!this.Props.consumeFuelOnlyWhenUsed && (this.flickComp == null || this.flickComp.SwitchIsOn) && (bioReactor !=null && (bioReactor.InnerPawn!=null)))
+            if (!Props.consumeFuelOnlyWhenUsed && (this.flickComp == null || this.flickComp.SwitchIsOn) && (bioReactor !=null && (bioReactor.InnerPawn!=null)))
             {
-                this.ConsumeFuel(this.ConsumptionRatePerTick);
+                ConsumeFuel(ConsumptionRatePerTick);
             }
         }
         private float ConsumptionRatePerTick
         {
             get
             {
-                return this.Props.fuelConsumptionRate / 60000f;
+                return Props.fuelConsumptionRate / 60000f;
             }
         }
     }
-
-
     [DefOf]
     public static class Bio_JobDefOf
     {
@@ -889,4 +965,7 @@ namespace BioReactor
 
         public static ThoughtDef LivingBattery;
     }
+
+
+
 }
