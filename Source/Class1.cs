@@ -783,98 +783,10 @@ namespace BioReactor
         }
     }
 
-   /* public class ITab_BioReactor : ITab
-    {
-        private const float TopAreaHeight = 35f;
-
-        private Vector2 scrollPosition = default(Vector2);
-
-        private static readonly Vector2 WinSize = new Vector2(300f, 480f);
-
-        private IStoreSettingsParent SelStoreSettingsParent
-        {
-            get
-            {
-                return (IStoreSettingsParent)SelObject;
-            }
-        }
-
-        public override bool IsVisible
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public ITab_BioReactor()
-        {
-            size = WinSize;
-            labelKey = "BioReactorTab";
-        }
-
-        protected override void FillTab()
-        {
-            Building_BioReactor thing = SelObject as Building_BioReactor;
-            CompRefuelable compRefuelable;
-            Rect rect = GenUI.ContractedBy(new Rect(0f, 0f, WinSize.x, WinSize.y), 10f);
-            GUI.BeginGroup(rect);
-            Text.Font = GameFont.Medium;
-            Text.Anchor = TextAnchor.MiddleCenter;
-            Widgets.Label(new Rect(rect)
-            {
-                height = 32f
-            }, Translator.Translate("BioReactorTitle"));
-            Text.Font = GameFont.Small;
-            Text.Anchor = TextAnchor.UpperLeft;
-            ThingFilter thingFilter;
-            if(thing !=null)
-            {
-                compRefuelable = thing.GetComp<CompRefuelable>();
-                if(compRefuelable !=null)
-                {
-                    thingFilter = compRefuelable.Props.fuelFilter;
-                    Rect rect2 = new Rect(0f, 40f, rect.width, rect.height - 40f);
-                    ThingFilterUI.DoThingFilterConfigWindow(rect2, ref scrollPosition, thing.filter, thingFilter, 8, null, null, false, null, null);
-                    PlayerKnowledgeDatabase.KnowledgeDemonstrated(ConceptDefOf.StorageTab, KnowledgeAmount.FrameDisplayed);
-                }
-            }
-           
-            GUI.EndGroup();
-        }
-    }*/
-
-    [StaticConstructorOnStartup]
-    public class CompBioRefuelable : CompRefuelable
-    {
-        CompFlickable flickComp;
-        Building_BioReactor bioReactor;
-        public override void PostSpawnSetup(bool respawningAfterLoad)
-        {
-            base.PostSpawnSetup(respawningAfterLoad);
-            flickComp = parent.GetComp<CompFlickable>();
-            bioReactor =(Building_BioReactor)parent;
-        }
-        public override void CompTick()
-        {
-            if (!Props.consumeFuelOnlyWhenUsed && (this.flickComp == null || this.flickComp.SwitchIsOn) && (bioReactor !=null && (bioReactor.InnerPawn!=null)))
-            {
-                ConsumeFuel(ConsumptionRatePerTick);
-            }
-        }
-        private float ConsumptionRatePerTick
-        {
-            get
-            {
-                return Props.fuelConsumptionRate / 60000f;
-            }
-        }
-    }
     [DefOf]
     public static class Bio_JobDefOf
     {
         public static JobDef CarryToBioReactor;
-
         public static JobDef EnterBioReactor;
     }
 
@@ -887,7 +799,6 @@ namespace BioReactor
             harmonyInstance.PatchAll(Assembly.GetExecutingAssembly());
         }
     }
-
     [HarmonyPatch(typeof(FloatMenuMakerMap)), HarmonyPatch("AddHumanlikeOrders")]
     internal class FloatMenuMakerMapPatches
     {
@@ -965,7 +876,4 @@ namespace BioReactor
 
         public static ThoughtDef LivingBattery;
     }
-
-
-
 }

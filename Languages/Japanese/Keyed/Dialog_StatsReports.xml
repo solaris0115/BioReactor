@@ -5,5 +5,7 @@
   <HistolysisDesc>The living objects are melted in the reactor and replaced to biofuel.</HistolysisDesc>
   <CarryToBioReactor>Carry {1_label} to BioReactor</CarryToBioReactor>
   <CannotCarryToBioReactor>Cannot carry to BioReactor</CannotCarryToBioReactor>
+	<RefuelTitle>Refuel Filter</RefuelTitle>
+	<RefuelTab>Filter Tab</RefuelTab>
 
 </LanguageData>

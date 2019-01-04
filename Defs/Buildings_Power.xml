@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
 	<ThingDef Class="BioReactor.BioReactorDef" Name="BioReactorBase" ParentName="BuildingBase" Abstract="True">
+		<defName>BioReactorBase</defName>
 		<label>Bio Reactor</label>
 		<description>It is a bioreactor. It draws energy from living life. Power output is proportional to body size of the creature contained. The amount of Nutrio to be injected into the living body is necessary.</description>
 		<thingClass>BioReactor.Building_BioReactor</thingClass>		
@@ -17,37 +18,39 @@
 		<designationCategory>Power</designationCategory>
 		<hasInteractionCell>true</hasInteractionCell>
 		<interactionCellOffset>(0,0,2)</interactionCellOffset>
-		<defaultPlacingRot>South</defaultPlacingRot>
+		<defaultPlacingRot>South</defaultPlacingRot>		
+		<inspectorTabs>
+			<li>BioReactor.ITab_CustomRefuel</li>
+		</inspectorTabs>
 		<building>
 			<ai_chillDestination>false</ai_chillDestination>
-			<!-- <fixedStorageSettings> -->
-			<!-- <priority>Critical</priority> -->
-			<!-- <filter> -->
-			<!-- <categories> -->
-			<!-- <li>Foods</li> -->
-			<!-- </categories> -->
-			<!-- <disallowedThingDefs> -->
-			<!-- <li>Hay</li> -->
-			<!-- </disallowedThingDefs> -->
-			<!-- </filter> -->
-			<!-- </fixedStorageSettings> -->
-			<!-- <defaultStorageSettings> -->
-			<!-- <priority>Critical</priority> -->
-			<!-- <filter> -->
-			<!-- <categories> -->
-			<!-- <li>Foods</li> -->
-			<!-- </categories> -->
-			<!-- <disallowedThingDefs> -->
-			<!-- <li>Chocolate</li> -->
-			<!-- <li>Pemmican</li> -->
-			<!-- <li>InsectJelly</li> -->
-			<!-- </disallowedThingDefs> -->
-			<!-- <disallowedCategories> -->
-			<!-- <li>FoodMeals</li> -->
-			<!-- <li>EggsFertilized</li> -->
-			<!-- </disallowedCategories> -->
-			<!-- </filter> -->
-			<!-- </defaultStorageSettings> -->
+			<fixedStorageSettings>
+				<priority>Critical</priority>
+				<filter>
+					<categories>
+						<li>Foods</li>
+					</categories>
+				</filter>
+			</fixedStorageSettings>
+			<defaultStorageSettings>
+				<priority>Critical</priority>
+				<filter>
+					<categories>
+						<li>Foods</li>
+					</categories>
+					<disallowedThingDefs>
+						<li>Chocolate</li>
+						<li>Pemmican</li>
+						<li>Kibble</li>
+						<li>Hay</li>
+					</disallowedThingDefs>
+					<disallowedCategories>
+						<li>FoodMeals</li>
+						<li>AnimalProductRaw</li>
+						<li>EggsFertilized</li>
+					</disallowedCategories>
+				</filter>
+			</defaultStorageSettings>
 		</building>
 		<comps>
 			<li Class="CompProperties_Forbiddable"/>
@@ -102,6 +105,7 @@
 		</costList>
 		<comps>
 			<li Class="CompProperties_Refuelable">
+				<compClass>BioReactor.CompBioRefuelable</compClass>
 				<fuelConsumptionRate>8.0</fuelConsumptionRate>
 				<fuelCapacity>50.0</fuelCapacity>
 				<fuelFilter>
@@ -142,7 +146,6 @@
 		<bodySizeMin>0</bodySizeMin>
 		<bodySizeMax>1.3</bodySizeMax>
 	</ThingDef>
-
 	<!-- 3X3 Size -->
 	<ThingDef Class="BioReactor.BioReactorDef" ParentName="BioReactorCircleBase">
 		<defName>BioReactorCircleLarge</defName>
@@ -164,6 +167,7 @@
 		</costList>
 		<comps>
 			<li Class="CompProperties_Refuelable">
+				<compClass>BioReactor.CompBioRefuelable</compClass>
 				<fuelConsumptionRate>8.0</fuelConsumptionRate>
 				<fuelCapacity>75.0</fuelCapacity>
 				<fuelFilter>
@@ -204,7 +208,6 @@
 		<bodySizeMin>0</bodySizeMin>
 		<bodySizeMax>3.5</bodySizeMax>
 	</ThingDef>
-
 	<!-- 4X4 Size -->
 	<ThingDef Class="BioReactor.BioReactorDef" ParentName="BioReactorCircleBase">
 		<defName>BioReactorCircleEX</defName>
@@ -227,6 +230,7 @@
 		<interactionCellOffset>(0,0,3)</interactionCellOffset>
 		<comps>
 			<li Class="CompProperties_Refuelable">
+				<compClass>BioReactor.CompBioRefuelable</compClass>
 				<fuelConsumptionRate>8.0</fuelConsumptionRate>
 				<fuelCapacity>100.0</fuelCapacity>
 				<fuelFilter>
@@ -291,6 +295,7 @@
 		</costList>
 		<comps>
 			<li Class="CompProperties_Refuelable">
+				<compClass>BioReactor.CompBioRefuelable</compClass>
 				<fuelConsumptionRate>8.0</fuelConsumptionRate>
 				<fuelCapacity>75.0</fuelCapacity>
 				<fuelFilter>
@@ -331,7 +336,6 @@
 		<bodySizeMin>0</bodySizeMin>
 		<bodySizeMax>3.5</bodySizeMax>
 	</ThingDef>
-
 	<!-- 4X4 Size -->
 	<ThingDef Class="BioReactor.BioReactorDef" ParentName="BioReactorSquareBase">
 		<defName>BioReactorEx</defName>
@@ -354,6 +358,7 @@
 		<interactionCellOffset>(0,0,3)</interactionCellOffset>
 		<comps>
 			<li Class="CompProperties_Refuelable">
+				<compClass>BioReactor.CompBioRefuelable</compClass>
 				<fuelConsumptionRate>8.0</fuelConsumptionRate>
 				<fuelCapacity>100.0</fuelCapacity>
 				<fuelFilter>
@@ -395,7 +400,19 @@
 		<bodySizeMax>8</bodySizeMax>
 	</ThingDef>
 
-
+	<WorkGiverDef>
+		<defName>CustomWorkRefuel</defName>
+		<label>refuel fuelable buildings</label>
+		<giverClass>BioReactor.WorkGiver_CustomRefuel</giverClass>
+		<workType>Hauling</workType>
+		<verb>refuel</verb>
+		<gerund>refueling</gerund>
+		<priorityInType>60</priorityInType>
+		<requiredCapacities>
+			<li>Manipulation</li>
+		</requiredCapacities>
+		<prioritizeSustains>true</prioritizeSustains>
+	</WorkGiverDef>
 	<JobDef>
 		<defName>CarryToBioReactor</defName>
 		<driverClass>BioReactor.JobDriver_CarryToBioReactor</driverClass>

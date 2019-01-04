@@ -5,5 +5,7 @@
   <HistolysisDesc>生物體在電池中被熔化成為生物燃料。</HistolysisDesc>
   <CarryToBioReactor>抓住{1_label}去當電池</CarryToBioReactor>
   <CannotCarryToBioReactor>不能帶去當電池</CannotCarryToBioReactor>
+	<RefuelTitle>Refuel Filter</RefuelTitle>
+	<RefuelTab>Filter Tab</RefuelTab>
 
 </LanguageData>
