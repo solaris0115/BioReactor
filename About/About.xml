@@ -2,7 +2,9 @@
 <ModMetaData>
 	<name>BioReactor</name>
 	<author>NukaFrog</author>
-	<targetVersion>1.0.0</targetVersion>
+	<supportedVersions>
+		<li>1.0</li>
+	</supportedVersions>
 	<url>https://github.com/jhjjgu0115/BioReactor/</url>
 	<description>
 Take everything. And make them Living Batteries.</description>

@@ -381,6 +381,7 @@ namespace BioReactor
             IEnumerable<ThingDef> enumerable = from def in DefDatabase<ThingDef>.AllDefs
                                                where typeof(Building_BioReactor).IsAssignableFrom(def.thingClass)
                                                select def;
+
             foreach (ThingDef singleDef in enumerable)
             {
                 Building_BioReactor building_BioReactor = (Building_BioReactor)GenClosest.ClosestThingReachable(p.Position, p.Map, ThingRequest.ForDef(singleDef), PathEndMode.InteractionCell, TraverseParms.For(traveler, Danger.Deadly, TraverseMode.ByPawn, false), 9999f, delegate (Thing x)
