@@ -101,7 +101,7 @@
 		<comps>			
 			<li Class="CompProperties_Power">
 				<compClass>BioReactor.CompBioPowerPlant</compClass>
-				<basePowerConsumption>-1400</basePowerConsumption>
+				<basePowerConsumption>-1000</basePowerConsumption>
 				<transmitsPower>true</transmitsPower>
 			</li>
 			<li Class="CompProperties_Refuelable">
@@ -236,7 +236,7 @@
 		<comps>			
 			<li Class="CompProperties_Power">
 				<compClass>BioReactor.CompBioPowerPlant</compClass>
-				<basePowerConsumption>-1000</basePowerConsumption>
+				<basePowerConsumption>-1400</basePowerConsumption>
 				<transmitsPower>true</transmitsPower>
 			</li>
 			<li Class="CompProperties_Refuelable">
@@ -374,7 +374,7 @@
 		<comps>			
 			<li Class="CompProperties_Power">
 				<compClass>BioReactor.CompBioPowerPlant</compClass>
-				<basePowerConsumption>-1000</basePowerConsumption>
+				<basePowerConsumption>-1400</basePowerConsumption>
 				<transmitsPower>true</transmitsPower>
 			</li>
 			<li Class="CompProperties_Refuelable">
