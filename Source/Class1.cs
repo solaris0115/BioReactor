@@ -41,7 +41,7 @@ namespace BioReactor
 
         public new void UpdateDesiredPowerOutput()
         {
-            if ((building_BioReactor != null && !(building_BioReactor.state == Building_BioReactor.ReactorState.Full)) || (this.breakdownableComp != null && this.breakdownableComp.BrokenDown) || (this.refuelableComp != null && !this.refuelableComp.HasFuel) || (this.flickableComp != null && !this.flickableComp.SwitchIsOn) || !base.PowerOn)
+            if ((building_BioReactor != null && !(building_BioReactor.state == Building_BioReactor.ReactorState.Full)) || (breakdownableComp != null && breakdownableComp.BrokenDown) || (refuelableComp != null && !refuelableComp.HasFuel) || (this.flickableComp != null && !this.flickableComp.SwitchIsOn) || !base.PowerOn)
             {
                 PowerOutput = 0f;
             }
@@ -61,7 +61,7 @@ namespace BioReactor
                     }
                     else
                     {
-                        PowerOutput = DesiredPowerOutput * 0.75f;
+                        PowerOutput = DesiredPowerOutput * 0.50f;
                     }
                     PowerOutput *= pawn.BodySize;
                 }

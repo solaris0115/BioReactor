@@ -54,11 +54,6 @@
 		</building>
 		<comps>
 			<li Class="CompProperties_Forbiddable"/>
-			<li Class="CompProperties_Power">
-				<compClass>BioReactor.CompBioPowerPlant</compClass>
-				<basePowerConsumption>-1400</basePowerConsumption>
-				<transmitsPower>true</transmitsPower>
-			</li>
 			<li Class="CompProperties_Flickable" />
 			<li Class="CompProperties_Breakdownable"/>
 		</comps>
@@ -103,7 +98,12 @@
 			<Steel>120</Steel>
 			<ComponentIndustrial>4</ComponentIndustrial>
 		</costList>
-		<comps>
+		<comps>			
+			<li Class="CompProperties_Power">
+				<compClass>BioReactor.CompBioPowerPlant</compClass>
+				<basePowerConsumption>-1400</basePowerConsumption>
+				<transmitsPower>true</transmitsPower>
+			</li>
 			<li Class="CompProperties_Refuelable">
 				<compClass>BioReactor.CompBioRefuelable</compClass>
 				<fuelConsumptionRate>8.0</fuelConsumptionRate>
@@ -165,7 +165,12 @@
 			<Steel>240</Steel>
 			<ComponentIndustrial>6</ComponentIndustrial>
 		</costList>
-		<comps>
+		<comps>			
+			<li Class="CompProperties_Power">
+				<compClass>BioReactor.CompBioPowerPlant</compClass>
+				<basePowerConsumption>-1200</basePowerConsumption>
+				<transmitsPower>true</transmitsPower>
+			</li>
 			<li Class="CompProperties_Refuelable">
 				<compClass>BioReactor.CompBioRefuelable</compClass>
 				<fuelConsumptionRate>8.0</fuelConsumptionRate>
@@ -228,7 +233,12 @@
 			<ComponentIndustrial>8</ComponentIndustrial>
 		</costList>
 		<interactionCellOffset>(0,0,3)</interactionCellOffset>
-		<comps>
+		<comps>			
+			<li Class="CompProperties_Power">
+				<compClass>BioReactor.CompBioPowerPlant</compClass>
+				<basePowerConsumption>-1000</basePowerConsumption>
+				<transmitsPower>true</transmitsPower>
+			</li>
 			<li Class="CompProperties_Refuelable">
 				<compClass>BioReactor.CompBioRefuelable</compClass>
 				<fuelConsumptionRate>8.0</fuelConsumptionRate>
@@ -293,7 +303,12 @@
 			<Steel>240</Steel>
 			<ComponentIndustrial>6</ComponentIndustrial>
 		</costList>
-		<comps>
+		<comps>			
+			<li Class="CompProperties_Power">
+				<compClass>BioReactor.CompBioPowerPlant</compClass>
+				<basePowerConsumption>-1200</basePowerConsumption>
+				<transmitsPower>true</transmitsPower>
+			</li>
 			<li Class="CompProperties_Refuelable">
 				<compClass>BioReactor.CompBioRefuelable</compClass>
 				<fuelConsumptionRate>8.0</fuelConsumptionRate>
@@ -356,7 +371,12 @@
 			<ComponentIndustrial>8</ComponentIndustrial>
 		</costList>
 		<interactionCellOffset>(0,0,3)</interactionCellOffset>
-		<comps>
+		<comps>			
+			<li Class="CompProperties_Power">
+				<compClass>BioReactor.CompBioPowerPlant</compClass>
+				<basePowerConsumption>-1000</basePowerConsumption>
+				<transmitsPower>true</transmitsPower>
+			</li>
 			<li Class="CompProperties_Refuelable">
 				<compClass>BioReactor.CompBioRefuelable</compClass>
 				<fuelConsumptionRate>8.0</fuelConsumptionRate>
