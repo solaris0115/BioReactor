@@ -142,7 +142,7 @@
 		</comps>
 		<innerDrawOffset>(0, -0.05, 0.62)</innerDrawOffset>
 		<waterDrawCenter>(0, -0.02, 0.62)</waterDrawCenter>
-		<waterDrawOffset>(1.6, 1.18)</waterDrawOffset>
+		<waterDrawSize>(1.6, 1.18)</waterDrawSize>
 		<bodySizeMin>0</bodySizeMin>
 		<bodySizeMax>1.3</bodySizeMax>
 	</ThingDef>
@@ -209,7 +209,7 @@
 		</comps>
 		<innerDrawOffset>(0, -0.05, 0.8)</innerDrawOffset>
 		<waterDrawCenter>(0.01, -0.02, 0.8)</waterDrawCenter>
-		<waterDrawOffset>(2.4, 2.35)</waterDrawOffset>
+		<waterDrawSize>(2.4, 2.35)</waterDrawSize>
 		<bodySizeMin>0</bodySizeMin>
 		<bodySizeMax>3.5</bodySizeMax>
 	</ThingDef>
@@ -277,7 +277,7 @@
 		</comps>
 		<innerDrawOffset>(0, -0.05, 0.8)</innerDrawOffset>
 		<waterDrawCenter>(0.01, -0.02, 1.25)</waterDrawCenter>
-		<waterDrawOffset>(3.5, 3)</waterDrawOffset>
+		<waterDrawSize>(3.5, 3)</waterDrawSize>
 		<bodySizeMin>0</bodySizeMin>
 		<bodySizeMax>8</bodySizeMax>
 	</ThingDef>
@@ -347,7 +347,7 @@
 		</comps>
 		<innerDrawOffset>(0, -0.05, 0.4)</innerDrawOffset>
 		<waterDrawCenter>(0, -0.02, 0.5)</waterDrawCenter>
-		<waterDrawOffset>(2.3, 2.65)</waterDrawOffset>
+		<waterDrawSize>(2.3, 2.65)</waterDrawSize>
 		<bodySizeMin>0</bodySizeMin>
 		<bodySizeMax>3.5</bodySizeMax>
 	</ThingDef>
@@ -415,7 +415,7 @@
 		</comps>
 		<innerDrawOffset>(0, -0.05, 0.4)</innerDrawOffset>
 		<waterDrawCenter>(0, -0.02, 0.5)</waterDrawCenter>
-		<waterDrawOffset>(2.5, 3.65)</waterDrawOffset>
+		<waterDrawSize>(2.5, 3.65)</waterDrawSize>
 		<bodySizeMin>0</bodySizeMin>
 		<bodySizeMax>8</bodySizeMax>
 	</ThingDef>

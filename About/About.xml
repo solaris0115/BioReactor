@@ -4,7 +4,9 @@
 	<author>NukaFrog</author>
 	<supportedVersions>
 		<li>1.0</li>
+		<li>1.1</li>
 	</supportedVersions>
+	<packageId>Solaris.BioReactor</packageId>
 	<url>https://github.com/jhjjgu0115/BioReactor/</url>
 	<description>
 Take everything. And make them Living Batteries.</description>

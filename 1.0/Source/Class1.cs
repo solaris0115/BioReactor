@@ -132,9 +132,12 @@ namespace BioReactor
 
     public class Building_BioReactor : Building_Casket
     {
+        /// <summary>
+        /// 내부 캐릭터 드로우 좌표. 리액터 실좌표 중심으로 드로우.
+        /// </summary>
         public Vector3 innerDrawOffset;
         public Vector3 waterDrawCenter;
-        public Vector2 waterDrawOffset;
+        public Vector2 waterDrawSize;
         public enum ReactorState
         {
             Empty,//none
@@ -196,7 +199,7 @@ namespace BioReactor
             {
                 innerDrawOffset = ((BioReactorDef)def).innerDrawOffset;
                 waterDrawCenter = ((BioReactorDef)def).waterDrawCenter;
-                waterDrawOffset = ((BioReactorDef)def).waterDrawOffset;
+                waterDrawSize = ((BioReactorDef)def).waterDrawSize;
             }
         }
 
@@ -318,7 +321,7 @@ namespace BioReactor
                 {
                     innerDrawOffset = ((BioReactorDef)def).innerDrawOffset;
                     waterDrawCenter = ((BioReactorDef)def).waterDrawCenter;
-                    waterDrawOffset = ((BioReactorDef)def).waterDrawOffset;
+                    waterDrawSize = ((BioReactorDef)def).waterDrawSize;
                 }
             }
             compRefuelable = GetComp<CompRefuelable>();
@@ -452,6 +455,10 @@ namespace BioReactor
 
         public override void Draw()
         {
+            /*
+             * 상태별 그래픽 UI 드로우
+             * 
+             */
             switch (state)
             {
                 case ReactorState.Empty:
@@ -510,7 +517,7 @@ namespace BioReactor
         {
             GenDraw.FillableBarRequest r = default(GenDraw.FillableBarRequest);
             r.center = DrawPos + waterDrawCenter;
-            r.size = waterDrawOffset;
+            r.size = waterDrawSize;
             r.fillPercent = fillPct;
             r.filledMat = SolidColorMaterials.SimpleSolidColorMaterial(color, false);
             r.unfilledMat = SolidColorMaterials.SimpleSolidColorMaterial(new Color(0, 0, 0, 0), false);
@@ -650,10 +657,25 @@ namespace BioReactor
 
     public class BioReactorDef:ThingDef
     {
+        /// <summary>
+        /// 캐릭터 드로우 좌표. 리액터의 실좌표 중심을 기준으로 드로우.
+        /// </summary>
         public Vector3 innerDrawOffset;
+        /// <summary>
+        /// 리액터 용액 드로우 중심 좌표. 리액터 실 좌표 중심을 기준으로 드로우
+        /// </summary>
         public Vector3 waterDrawCenter;
-        public Vector2 waterDrawOffset;
+        /// <summary>
+        /// 리액터 용액 그래픽 넓이
+        /// </summary>
+        public Vector2 waterDrawSize;
+        /// <summary>
+        /// 수용 생명체 크기 최소 한도
+        /// </summary>
         public float bodySizeMin;
+        /// <summary>
+        /// 수용 생명체 크기 최대 한도
+        /// </summary>
         public float bodySizeMax;
     }
 
