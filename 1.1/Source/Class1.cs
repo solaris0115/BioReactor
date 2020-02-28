@@ -138,6 +138,7 @@ namespace BioReactor
         public Vector3 innerDrawOffset;
         public Vector3 waterDrawCenter;
         public Vector2 waterDrawSize;
+        //static Vector3 waterDrawY = new Vector3(0, 0.3f, 0);
         public enum ReactorState
         {
             Empty,//none
@@ -342,6 +343,7 @@ namespace BioReactor
                 Pawn pawn = ContainedThing as Pawn;
                 if (pawn != null)
                 {
+                    pawn.Rotation = Rot4.South;
                     compRefuelable.Refuel(35);
                     DamageInfo d = new DamageInfo();
                     d.Def = DamageDefOf.Burn;
@@ -473,7 +475,7 @@ namespace BioReactor
                         Pawn pawn = t as Pawn;
                         if (pawn != null)
                         {
-                            DrawInnerThing(pawn, DrawPos + innerDrawOffset, 0, true, Rot4.South, Rot4.South, RotDrawMode.Fresh, false, false);
+                            DrawInnerThing(pawn, DrawPos + innerDrawOffset);
                             LiquidDraw(new Color32(123, 255, 233, 75), fillpct);
                         }
                     }
@@ -484,7 +486,7 @@ namespace BioReactor
                         Pawn pawn = t as Pawn;
                         if (pawn != null)
                         {
-                            DrawInnerThing(pawn, DrawPos + innerDrawOffset, 0, true, Rot4.South, Rot4.South, RotDrawMode.Fresh, false, false);
+                            DrawInnerThing(pawn, DrawPos + innerDrawOffset);
                             LiquidDraw(new Color32(123, 255, 233, 75), 1);
                         }
                     }
@@ -495,7 +497,7 @@ namespace BioReactor
                         Pawn pawn = t as Pawn;
                         if (pawn != null)
                         {
-                            DrawInnerThing(pawn, DrawPos + innerDrawOffset, 0, true, Rot4.South, Rot4.South, RotDrawMode.Fresh, false, false);
+                            DrawInnerThing(pawn, DrawPos + innerDrawOffset);
                             LiquidDraw(new Color(0.48f + (0.2f * histolysisPct), 1 - (0.7f * histolysisPct), 0.9f - (0.6f * histolysisPct), 0.3f + histolysisPct * 0.55f), 1);
                         }
                     }
@@ -515,8 +517,15 @@ namespace BioReactor
                     }
                     break;
             }
-            base.Draw();
+            //Graphic.Draw(GenThing.TrueCenter(Position, Rot4.South, def.size, 11.7f), Rot4.South, this, 0f);
+            Comps_PostDraw();
         }
+        public override void Print(SectionLayer layer)
+        {
+            //this.Graphic.Print(layer, this);
+            Printer_Plane.PrintPlane(layer, GenThing.TrueCenter(Position, Rot4.South, def.size, 11.7f), Graphic.drawSize, Graphic.MatSingle, 0, false, null, null, 0.01f, 0f);
+        }
+
         public virtual void LiquidDraw(Color color, float fillPct)
         {
             GenDraw.FillableBarRequest r = default(GenDraw.FillableBarRequest);
@@ -531,130 +540,32 @@ namespace BioReactor
             r.rotation = rotation;
             GenDraw.DrawFillableBar(r);
         }
-        public virtual void DrawInnerThing(Pawn pawn, Vector3 rootLoc, float angle, bool renderBody, Rot4 bodyFacing, Rot4 headFacing, RotDrawMode bodyDrawType, bool portrait, bool headStump)
+        public static MethodInfo pawnrender = AccessTools.Method(typeof(PawnRenderer), "RenderPawnInternal", new Type[]
+            {
+                typeof(Vector3),
+                typeof(float),
+                typeof(bool),
+                typeof(Rot4),
+                typeof(Rot4),
+                typeof(RotDrawMode),
+                typeof(bool),
+                typeof(bool),
+                typeof(bool)
+            });
+        public virtual void DrawInnerThing(Pawn pawn, Vector3 rootLoc)
         {
-            PawnGraphicSet graphics = pawn.Drawer.renderer.graphics;
-            PawnRenderer renderer = pawn.Drawer.renderer;
-            if (!graphics.AllResolved)
-            {
-                graphics.ResolveAllGraphics();
-            }
-            Quaternion quaternion = Quaternion.AngleAxis(angle, Vector3.up);
-            Mesh mesh = null;
-            if (renderBody)
-            {
-                Vector3 loc = rootLoc;
-                loc.y += 0.0078125f;
-                if (bodyDrawType == RotDrawMode.Dessicated && !pawn.RaceProps.Humanlike && graphics.dessicatedGraphic != null && !portrait)
-                {
-                    graphics.dessicatedGraphic.Draw(loc, bodyFacing, pawn, angle);
-                }
-                else
-                {
-                    if (pawn.RaceProps.Humanlike)
+            pawnrender.Invoke(pawn.Drawer.renderer, new object[]
                     {
-                        mesh = MeshPool.humanlikeBodySet.MeshAt(bodyFacing);
-                    }
-                    else
-                    {
-                        mesh = graphics.nakedGraphic.MeshAt(bodyFacing);
-                    }
-                    List<Material> list = graphics.MatsBodyBaseAt(bodyFacing, bodyDrawType);
-                    for (int i = 0; i < list.Count; i++)
-                    {
-                        Material damagedMat = graphics.flasher.GetDamagedMat(list[i]);
-                        GenDraw.DrawMeshNowOrLater(mesh, loc, quaternion, damagedMat, portrait);
-                        loc.y += 0.00390625f;
-                    }
-                }
-            }
-            Vector3 vector = rootLoc;
-            Vector3 a = rootLoc;
-            if (bodyFacing != Rot4.North)
-            {
-                a.y += 0.02734375f;
-                vector.y += 0.0234375f;
-            }
-            else
-            {
-                a.y += 0.0234375f;
-                vector.y += 0.02734375f;
-            }
-            if (graphics.headGraphic != null)
-            {
-                Vector3 b = quaternion * renderer.BaseHeadOffsetAt(headFacing);
-                Material material = graphics.HeadMatAt(headFacing, bodyDrawType, headStump);
-                if (material != null)
-                {
-                    Mesh mesh2 = MeshPool.humanlikeHeadSet.MeshAt(headFacing);
-                    GenDraw.DrawMeshNowOrLater(mesh2, a + b, quaternion, material, portrait);
-                }
-                Vector3 loc2 = rootLoc + b;
-                loc2.y += 0.03125f;
-                bool flag = false;
-                if (!portrait || !Prefs.HatsOnlyOnMap)
-                {
-                    Mesh mesh3 = graphics.HairMeshSet.MeshAt(headFacing);
-                    List<ApparelGraphicRecord> apparelGraphics = graphics.apparelGraphics;
-                    for (int j = 0; j < apparelGraphics.Count; j++)
-                    {
-                        if (apparelGraphics[j].sourceApparel.def.apparel.LastLayer == ApparelLayerDefOf.Overhead)
-                        {
-                            if (!apparelGraphics[j].sourceApparel.def.apparel.hatRenderedFrontOfFace)
-                            {
-                                flag = true;
-                                Material material2 = apparelGraphics[j].graphic.MatAt(bodyFacing, null);
-                                material2 = graphics.flasher.GetDamagedMat(material2);
-                                GenDraw.DrawMeshNowOrLater(mesh3, loc2, quaternion, material2, portrait);
-                            }
-                            else
-                            {
-                                Material material3 = apparelGraphics[j].graphic.MatAt(bodyFacing, null);
-                                material3 = graphics.flasher.GetDamagedMat(material3);
-                                Vector3 loc3 = rootLoc + b;
-                                loc3.y += ((!(bodyFacing == Rot4.North)) ? 0.03515625f : 0.00390625f);
-                                GenDraw.DrawMeshNowOrLater(mesh3, loc3, quaternion, material3, portrait);
-                            }
-                        }
-                    }
-                }
-                if (!flag && bodyDrawType != RotDrawMode.Dessicated && !headStump)
-                {
-                    Mesh mesh4 = graphics.HairMeshSet.MeshAt(headFacing);
-                    Material mat = graphics.HairMatAt(headFacing);
-                    GenDraw.DrawMeshNowOrLater(mesh4, loc2, quaternion, mat, portrait);
-                }
-            }
-            if (renderBody)
-            {
-                for (int k = 0; k < graphics.apparelGraphics.Count; k++)
-                {
-                    ApparelGraphicRecord apparelGraphicRecord = graphics.apparelGraphics[k];
-                    if (apparelGraphicRecord.sourceApparel.def.apparel.LastLayer == ApparelLayerDefOf.Shell)
-                    {
-                        Material material4 = apparelGraphicRecord.graphic.MatAt(bodyFacing, null);
-                        material4 = graphics.flasher.GetDamagedMat(material4);
-                        GenDraw.DrawMeshNowOrLater(mesh, vector, quaternion, material4, portrait);
-                    }
-                }
-            }
-            if (!portrait && pawn.RaceProps.Animal && pawn.inventory != null && pawn.inventory.innerContainer.Count > 0 && graphics.packGraphic != null)
-            {
-                Graphics.DrawMesh(mesh, vector, quaternion, graphics.packGraphic.MatAt(bodyFacing, null), 0);
-            }
-            if (!portrait)
-            {
-                if (pawn.apparel != null)
-                {
-                    List<Apparel> wornApparel = pawn.apparel.WornApparel;
-                    for (int l = 0; l < wornApparel.Count; l++)
-                    {
-                        wornApparel[l].DrawWornExtras();
-                    }
-                }
-                Vector3 bodyLoc = rootLoc;
-                bodyLoc.y += 0.04296875f;
-            }
+                        rootLoc,
+                        0,
+                        true,
+                        Rot4.South,
+                        Rot4.South,
+                        RotDrawMode.Fresh,
+                        false,
+                        false,
+                        false
+                    });
         }
 
         public static IEnumerable<Gizmo> CopyPasteGizmosFor(StorageSettings s)

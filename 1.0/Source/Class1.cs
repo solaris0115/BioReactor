@@ -138,6 +138,7 @@ namespace BioReactor
         public Vector3 innerDrawOffset;
         public Vector3 waterDrawCenter;
         public Vector2 waterDrawSize;
+        //static Vector3 waterDrawY = new Vector3(0, 0.3f, 0);
         public enum ReactorState
         {
             Empty,//none
@@ -151,19 +152,19 @@ namespace BioReactor
         public float fillpct;
         public float histolysisPct = 0;
 
-        public CompRefuelable compRefuelable;
+        public CompBioRefuelable compRefuelable;
         public CompForbiddable forbiddable;
 
         public bool IsContainingThingPawn
         {
             get
             {
-                if(!HasAnyContents)
+                if (!HasAnyContents)
                 {
                     return false;
                 }
                 Pawn pawn = ContainedThing as Pawn;
-                if(pawn !=null)
+                if (pawn != null)
                 {
                     return true;
                 }
@@ -190,12 +191,12 @@ namespace BioReactor
         public override void SpawnSetup(Map map, bool respawningAfterLoad)
         {
             base.SpawnSetup(map, respawningAfterLoad);
-            compRefuelable = GetComp<CompRefuelable>();
+            compRefuelable = GetComp<CompBioRefuelable>();
             forbiddable = GetComp<CompForbiddable>();
             fillpct = 0;
             histolysisPct = 0;
             BioReactorDef reactorDef = def as BioReactorDef;
-            if(reactorDef!=null)
+            if (reactorDef != null)
             {
                 innerDrawOffset = ((BioReactorDef)def).innerDrawOffset;
                 waterDrawCenter = ((BioReactorDef)def).waterDrawCenter;
@@ -213,7 +214,7 @@ namespace BioReactor
                 }
                 state = ReactorState.StartFilling;
                 Pawn pawn = thing as Pawn;
-                if(pawn !=null && pawn.RaceProps.Humanlike)
+                if (pawn != null && pawn.RaceProps.Humanlike)
                 {
                     pawn.needs.mood.thoughts.memories.TryGainMemory(BioReactorThoughtDef.LivingBattery, null);
                 }
@@ -277,9 +278,13 @@ namespace BioReactor
                                 }
                             };
                         }
-                    }                    
+                    }
 
                 }
+            }
+            foreach (Gizmo gizmo2 in CopyPasteGizmosFor(compRefuelable.inputSettings))
+            {
+                yield return gizmo2;
             }
             yield break;
         }
@@ -314,7 +319,7 @@ namespace BioReactor
             Scribe_Values.Look<ReactorState>(ref state, "state");
             Scribe_Values.Look<float>(ref fillpct, "fillpct");
             Scribe_Values.Look<float>(ref histolysisPct, "histolysisPct");
-            if(Scribe.mode == LoadSaveMode.PostLoadInit)
+            if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
                 BioReactorDef reactorDef = def as BioReactorDef;
                 if (reactorDef != null)
@@ -324,7 +329,7 @@ namespace BioReactor
                     waterDrawSize = ((BioReactorDef)def).waterDrawSize;
                 }
             }
-            compRefuelable = GetComp<CompRefuelable>();
+            compRefuelable = GetComp<CompBioRefuelable>();
             forbiddable = GetComp<CompForbiddable>();
         }
         public override void PostMake()
@@ -338,6 +343,7 @@ namespace BioReactor
                 Pawn pawn = ContainedThing as Pawn;
                 if (pawn != null)
                 {
+                    pawn.Rotation = Rot4.South;
                     compRefuelable.Refuel(35);
                     DamageInfo d = new DamageInfo();
                     d.Def = DamageDefOf.Burn;
@@ -469,7 +475,7 @@ namespace BioReactor
                         Pawn pawn = t as Pawn;
                         if (pawn != null)
                         {
-                            DrawInnerThing(pawn, DrawPos + innerDrawOffset, 0, true, Rot4.South, Rot4.South, RotDrawMode.Fresh, false, false);
+                            DrawInnerThing(pawn, DrawPos + innerDrawOffset);
                             LiquidDraw(new Color32(123, 255, 233, 75), fillpct);
                         }
                     }
@@ -480,7 +486,7 @@ namespace BioReactor
                         Pawn pawn = t as Pawn;
                         if (pawn != null)
                         {
-                            DrawInnerThing(pawn, DrawPos + innerDrawOffset, 0, true, Rot4.South, Rot4.South, RotDrawMode.Fresh, false, false);
+                            DrawInnerThing(pawn, DrawPos + innerDrawOffset);
                             LiquidDraw(new Color32(123, 255, 233, 75), 1);
                         }
                     }
@@ -491,7 +497,7 @@ namespace BioReactor
                         Pawn pawn = t as Pawn;
                         if (pawn != null)
                         {
-                            DrawInnerThing(pawn, DrawPos + innerDrawOffset, 0, true, Rot4.South, Rot4.South, RotDrawMode.Fresh, false, false);
+                            DrawInnerThing(pawn, DrawPos + innerDrawOffset);
                             LiquidDraw(new Color(0.48f + (0.2f * histolysisPct), 1 - (0.7f * histolysisPct), 0.9f - (0.6f * histolysisPct), 0.3f + histolysisPct * 0.55f), 1);
                         }
                     }
@@ -511,8 +517,15 @@ namespace BioReactor
                     }
                     break;
             }
-            base.Draw();
+            //Graphic.Draw(GenThing.TrueCenter(Position, Rot4.South, def.size, 11.7f), Rot4.South, this, 0f);
+            Comps_PostDraw();
         }
+        public override void Print(SectionLayer layer)
+        {
+            //this.Graphic.Print(layer, this);
+            Printer_Plane.PrintPlane(layer, GenThing.TrueCenter(Position, Rot4.South, def.size, 11.7f), Graphic.drawSize, Graphic.MatSingle, 0, false, null, null, 0.01f, 0f);
+        }
+
         public virtual void LiquidDraw(Color color, float fillPct)
         {
             GenDraw.FillableBarRequest r = default(GenDraw.FillableBarRequest);
@@ -527,135 +540,89 @@ namespace BioReactor
             r.rotation = rotation;
             GenDraw.DrawFillableBar(r);
         }
-        public virtual void DrawInnerThing(Pawn pawn, Vector3 rootLoc, float angle, bool renderBody, Rot4 bodyFacing, Rot4 headFacing, RotDrawMode bodyDrawType, bool portrait, bool headStump)
+        public static MethodInfo pawnrender = AccessTools.Method(typeof(PawnRenderer), "RenderPawnInternal", new Type[]
+            {
+                typeof(Vector3),
+                typeof(float),
+                typeof(bool),
+                typeof(Rot4),
+                typeof(Rot4),
+                typeof(RotDrawMode),
+                typeof(bool),
+                typeof(bool)
+            });
+        public virtual void DrawInnerThing(Pawn pawn, Vector3 rootLoc)
         {
-            PawnGraphicSet graphics = pawn.Drawer.renderer.graphics;
-            PawnRenderer renderer = pawn.Drawer.renderer;
-            if (!graphics.AllResolved)
-            {
-                graphics.ResolveAllGraphics();
-            }
-            Quaternion quaternion = Quaternion.AngleAxis(angle, Vector3.up);
-            Mesh mesh = null;
-            if (renderBody)
-            {
-                Vector3 loc = rootLoc;
-                loc.y += 0.0078125f;
-                if (bodyDrawType == RotDrawMode.Dessicated && !pawn.RaceProps.Humanlike && graphics.dessicatedGraphic != null && !portrait)
-                {
-                    graphics.dessicatedGraphic.Draw(loc, bodyFacing, pawn, angle);
-                }
-                else
-                {
-                    if (pawn.RaceProps.Humanlike)
+            pawnrender.Invoke(pawn.Drawer.renderer, new object[]
                     {
-                        mesh = MeshPool.humanlikeBodySet.MeshAt(bodyFacing);
-                    }
-                    else
-                    {
-                        mesh = graphics.nakedGraphic.MeshAt(bodyFacing);
-                    }
-                    List<Material> list = graphics.MatsBodyBaseAt(bodyFacing, bodyDrawType);
-                    for (int i = 0; i < list.Count; i++)
-                    {
-                        Material damagedMat = graphics.flasher.GetDamagedMat(list[i]);
-                        GenDraw.DrawMeshNowOrLater(mesh, loc, quaternion, damagedMat, portrait);
-                        loc.y += 0.00390625f;
-                    }
-                }
-            }
-            Vector3 vector = rootLoc;
-            Vector3 a = rootLoc;
-            if (bodyFacing != Rot4.North)
+                        rootLoc,
+                        0,
+                        true,
+                        Rot4.South,
+                        Rot4.South,
+                        RotDrawMode.Fresh,
+                        false,
+                        false
+                    });
+        }
+
+        public static IEnumerable<Gizmo> CopyPasteGizmosFor(StorageSettings s)
+        {
+            yield return new Command_Action
             {
-                a.y += 0.02734375f;
-                vector.y += 0.0234375f;
-            }
-            else
-            {
-                a.y += 0.0234375f;
-                vector.y += 0.02734375f;
-            }
-            if (graphics.headGraphic != null)
-            {
-                Vector3 b = quaternion * renderer.BaseHeadOffsetAt(headFacing);
-                Material material = graphics.HeadMatAt(headFacing, bodyDrawType, headStump);
-                if (material != null)
+                icon = ContentFinder<Texture2D>.Get("UI/Commands/CopySettings", true),
+                defaultLabel = "CommandCopyBioReactorSettingsLabel".Translate(),
+                defaultDesc = "CommandCopyBioReactorSettingsDesc".Translate(),
+                action = delegate ()
                 {
-                    Mesh mesh2 = MeshPool.humanlikeHeadSet.MeshAt(headFacing);
-                    GenDraw.DrawMeshNowOrLater(mesh2, a + b, quaternion, material, portrait);
-                }
-                Vector3 loc2 = rootLoc + b;
-                loc2.y += 0.03125f;
-                bool flag = false;
-                if (!portrait || !Prefs.HatsOnlyOnMap)
-                {
-                    Mesh mesh3 = graphics.HairMeshSet.MeshAt(headFacing);
-                    List<ApparelGraphicRecord> apparelGraphics = graphics.apparelGraphics;
-                    for (int j = 0; j < apparelGraphics.Count; j++)
-                    {
-                        if (apparelGraphics[j].sourceApparel.def.apparel.LastLayer == ApparelLayerDefOf.Overhead)
-                        {
-                            if (!apparelGraphics[j].sourceApparel.def.apparel.hatRenderedFrontOfFace)
-                            {
-                                flag = true;
-                                Material material2 = apparelGraphics[j].graphic.MatAt(bodyFacing, null);
-                                material2 = graphics.flasher.GetDamagedMat(material2);
-                                GenDraw.DrawMeshNowOrLater(mesh3, loc2, quaternion, material2, portrait);
-                            }
-                            else
-                            {
-                                Material material3 = apparelGraphics[j].graphic.MatAt(bodyFacing, null);
-                                material3 = graphics.flasher.GetDamagedMat(material3);
-                                Vector3 loc3 = rootLoc + b;
-                                loc3.y += ((!(bodyFacing == Rot4.North)) ? 0.03515625f : 0.00390625f);
-                                GenDraw.DrawMeshNowOrLater(mesh3, loc3, quaternion, material3, portrait);
-                            }
-                        }
-                    }
-                }
-                if (!flag && bodyDrawType != RotDrawMode.Dessicated && !headStump)
-                {
-                    Mesh mesh4 = graphics.HairMeshSet.MeshAt(headFacing);
-                    Material mat = graphics.HairMatAt(headFacing);
-                    GenDraw.DrawMeshNowOrLater(mesh4, loc2, quaternion, mat, portrait);
-                }
-            }
-            if (renderBody)
+                    SoundDefOf.Tick_High.PlayOneShotOnCamera(null);
+                    Copy(s);
+                },
+                hotKey = KeyBindingDefOf.Misc4
+            };
+            Command_Action command_Action = new Command_Action();
+            command_Action.icon = ContentFinder<Texture2D>.Get("UI/Commands/PasteSettings", true);
+            command_Action.defaultLabel = "CommandPasteBioReactorSettingsLabel".Translate();
+            command_Action.defaultDesc = "CommandPasteBioReactorSettingsDesc".Translate();
+            command_Action.action = delegate ()
             {
-                for (int k = 0; k < graphics.apparelGraphics.Count; k++)
-                {
-                    ApparelGraphicRecord apparelGraphicRecord = graphics.apparelGraphics[k];
-                    if (apparelGraphicRecord.sourceApparel.def.apparel.LastLayer == ApparelLayerDefOf.Shell)
-                    {
-                        Material material4 = apparelGraphicRecord.graphic.MatAt(bodyFacing, null);
-                        material4 = graphics.flasher.GetDamagedMat(material4);
-                        GenDraw.DrawMeshNowOrLater(mesh, vector, quaternion, material4, portrait);
-                    }
-                }
-            }
-            if (!portrait && pawn.RaceProps.Animal && pawn.inventory != null && pawn.inventory.innerContainer.Count > 0 && graphics.packGraphic != null)
+                SoundDefOf.Tick_High.PlayOneShotOnCamera(null);
+                PasteInto(s);
+            };
+            command_Action.hotKey = KeyBindingDefOf.Misc5;
+            if (!HasCopiedSettings)
             {
-                Graphics.DrawMesh(mesh, vector, quaternion, graphics.packGraphic.MatAt(bodyFacing, null), 0);
+                command_Action.Disable(null);
             }
-            if (!portrait)
+            yield return command_Action;
+            yield break;
+        }
+
+        private static StorageSettings clipboard = new StorageSettings();
+
+        private static bool copied = false;
+
+        public static bool HasCopiedSettings
+        {
+            get
             {
-                if (pawn.apparel != null)
-                {
-                    List<Apparel> wornApparel = pawn.apparel.WornApparel;
-                    for (int l = 0; l < wornApparel.Count; l++)
-                    {
-                        wornApparel[l].DrawWornExtras();
-                    }
-                }
-                Vector3 bodyLoc = rootLoc;
-                bodyLoc.y += 0.04296875f;
+                return copied;
             }
         }
-        
+
+        public static void Copy(StorageSettings s)
+        {
+            clipboard.CopyFrom(s);
+            copied = true;
+        }
+
+        public static void PasteInto(StorageSettings s)
+        {
+            s.CopyFrom(clipboard);
+        }
     }
 
-    public class BioReactorDef:ThingDef
+    public class BioReactorDef : ThingDef
     {
         /// <summary>
         /// 캐릭터 드로우 좌표. 리액터의 실좌표 중심을 기준으로 드로우.

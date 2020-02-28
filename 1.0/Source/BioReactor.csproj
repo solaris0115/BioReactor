@@ -36,27 +36,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\RimWorldWin64_Data\Managed\Assembly-CSharp.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>..\..\..\RimWorldWin64_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="HugsLib">
-      <HintPath>..\..\..\..\..\workshop\content\294100\818773962\Assemblies\HugsLib.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RWASFilterLib">
-      <HintPath>..\..\..\RimWorldWin64_Data\Managed\RWASFilterLib.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RWASWidgets">
-      <HintPath>..\..\..\RimWorldWin64_Data\Managed\RWASWidgets.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RWAutoSell">
-      <HintPath>..\..\..\RimWorldWin64_Data\Managed\RWAutoSell.dll</HintPath>
+      <HintPath>..\..\..\..\RimWorldWin64_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -65,12 +45,8 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="TextMeshPro-1.0.55.56.0b11">
-      <HintPath>..\..\..\RimWorldWin64_Data\Managed\TextMeshPro-1.0.55.56.0b11.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>..\..\..\RimWorldWin64_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>..\..\..\..\RimWorldWin64_Data\Managed\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
