@@ -30,6 +30,23 @@ namespace BioReactor
                 }
             }
             bioReactor = (Building_BioReactor)parent;
+
+            CompMapRefuelable component = parent.Map.GetComponent<CompMapRefuelable>();
+            if (component == null)
+            {
+                return;
+            }
+            component.comps.Add(this);
+        }
+        public override void PostDeSpawn(Map map)
+        {
+            base.PostDeSpawn(map);
+            CompMapRefuelable component = map.GetComponent<CompMapRefuelable>();
+            if (component == null)
+            {
+                return;
+            }
+            component.comps.Remove(this);
         }
         public override void PostExposeData()
         {

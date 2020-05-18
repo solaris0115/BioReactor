@@ -81,6 +81,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CompMapRefuelable.cs" />
     <Compile Include="RefuelWorkGiverUtility.cs" />
     <Compile Include="ITab_CustomRefuel.cs" />
     <Compile Include="CompBioRefuelable.cs" />

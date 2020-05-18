@@ -14,14 +14,9 @@ namespace BioReactor
 {
     public class WorkGiver_CustomRefuel : WorkGiver_Scanner
     {
-        public override ThingRequest PotentialWorkThingRequest
+        public override IEnumerable<Thing> PotentialWorkThingsGlobal(Pawn pawn)
         {
-            get
-            {
-                
-                ThingRequest thingRequest = ThingRequest.ForGroup(ThingRequestGroup.BuildingArtificial);
-                return thingRequest;
-            }
+            return pawn.Map.GetComponent<CompMapRefuelable>().comps.Select(x => x.parent);
         }
 
         public override PathEndMode PathEndMode
