@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+	<EnterBioReactor>Enter BioReactor</EnterBioReactor>
+	<Histolysis>Histolysis</Histolysis>
+	<HistolysisDesc>The living objects are melted in the reactor and replaced to biofuel.</HistolysisDesc>
+	<CarryToBioReactor>Carry {1_label} to BioReactor</CarryToBioReactor>
+	<CannotCarryToBioReactor>Cannot carry to BioReactor</CannotCarryToBioReactor>
+	<RefuelTitle>Refuel Filter</RefuelTitle>
+	<RefuelTab>Filter Tab</RefuelTab>
+	
+	<CommandCopyBioReactorSettingsLabel>Copy settings</CommandCopyBioReactorSettingsLabel>
+	<CommandCopyBioReactorSettingsDesc>Copy this BioReactor's settings to the clipboard so you can paste them onto another BioReactor.</CommandCopyBioReactorSettingsDesc>
+
+	<CommandPasteBioReactorSettingsLabel>Paste settings</CommandPasteBioReactorSettingsLabel>
+	<CommandPasteBioReactorSettingsDesc>Overwrite this BioReactor's settings with those previously copied to the clipboard.</CommandPasteBioReactorSettingsDesc>
+</LanguageData>

@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+
+  <!-- 4X4 Size -->
+
+  <KnowHistolysisHumanlike.stages.0.label>我們把活人融化了</KnowHistolysisHumanlike.stages.0.label>
+  <KnowHistolysisHumanlike.stages.0.description>他就這樣子被溶解了...我.....(嘔</KnowHistolysisHumanlike.stages.0.description>
+
+  <KnowHistolysisHumanlikeCannibal.stages.0.label>討厭</KnowHistolysisHumanlikeCannibal.stages.0.label>
+  <KnowHistolysisHumanlikeCannibal.stages.0.description>說真的，我沒什麼食慾了</KnowHistolysisHumanlikeCannibal.stages.0.description>
+
+  <KnowHistolysisHumanlikePsychopath.stages.0.label>我看到人融化了。</KnowHistolysisHumanlikePsychopath.stages.0.label>
+  <KnowHistolysisHumanlikePsychopath.stages.0.description>他們 重新回歸了原始....斯巴拉希~</KnowHistolysisHumanlikePsychopath.stages.0.description>
+
+  <LivingBattery.stages.0.label>我變成了個電池</LivingBattery.stages.0.label>
+  <LivingBattery.stages.0.description>不! 我再也不想回去了</LivingBattery.stages.0.description>
+
+
+</LanguageData>
