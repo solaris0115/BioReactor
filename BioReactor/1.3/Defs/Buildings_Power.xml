@@ -1,0 +1,582 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+	<ThingDef Class="BioReactor.BioReactorDef" Name="BioReactorBase" ParentName="BuildingBase" Abstract="True">
+		<defName>BioReactorBase</defName>
+		<label>Bio Reactor</label>
+		<description>It is a bioreactor. It draws energy from living life. Power output is proportional to body size of the creature contained. The amount of Nutrio to be injected into the living body is necessary.</description>
+		<thingClass>BioReactor.Building_BioReactor</thingClass>
+		<drawerType>MapMeshAndRealTime</drawerType>
+		<altitudeLayer>Pawn</altitudeLayer>
+		<passability>PassThroughOnly</passability>
+		<pathCost>25</pathCost>
+		<blockWind>true</blockWind>
+		<fillPercent>0.8</fillPercent>
+		<canOverlapZones>false</canOverlapZones>
+		<statBases>
+			<Flammability>0.2</Flammability>
+		</statBases>
+		<tickerType>Normal</tickerType>
+		<designationCategory>Power</designationCategory>
+		<hasInteractionCell>true</hasInteractionCell>
+		<interactionCellOffset>(0,0,2)</interactionCellOffset>
+		<defaultPlacingRot>South</defaultPlacingRot>		
+		<inspectorTabs>
+			<li>BioReactor.ITab_CustomRefuel</li>
+		</inspectorTabs>
+		<building>
+			<ai_chillDestination>false</ai_chillDestination>
+			<fixedStorageSettings>
+				<priority>Critical</priority>
+				<filter>
+					<categories>
+						<li>Foods</li>
+					</categories>
+				</filter>
+			</fixedStorageSettings>
+			<defaultStorageSettings>
+				<priority>Critical</priority>
+				<filter>
+					<categories>
+						<li>Foods</li>
+					</categories>
+					<disallowedThingDefs>
+						<li>Chocolate</li>
+						<li>Pemmican</li>
+						<li>Kibble</li>
+						<li>Hay</li>
+					</disallowedThingDefs>
+					<disallowedCategories>
+						<li>FoodMeals</li>
+						<li>AnimalProductRaw</li>
+						<li>EggsFertilized</li>
+					</disallowedCategories>
+				</filter>
+			</defaultStorageSettings>
+		</building>
+		<comps>
+			<li Class="CompProperties_Forbiddable"/>
+			<li Class="CompProperties_Flickable" />
+			<li Class="CompProperties_Breakdownable"/>
+		</comps>
+		<terrainAffordanceNeeded>Medium</terrainAffordanceNeeded>
+		<constructionSkillPrerequisite>8</constructionSkillPrerequisite>
+		<researchPrerequisites>
+			<li>BiofuelRefining</li>
+		</researchPrerequisites>
+		<destroyable>true</destroyable>
+		<rotatable>false</rotatable>		
+	</ThingDef>
+
+	<ThingDef Class="BioReactor.BioReactorDef" Name="BioReactorCircleBase" ParentName="BioReactorBase" Abstract="True">
+		<designatorDropdown>BioReactor_CircleType</designatorDropdown>		
+		<uiIconPath>Things/Building/BioReactor_CircleType_Full</uiIconPath>
+		<uiIconOffset>(0, 0)</uiIconOffset>
+		<uiIconScale>1.2</uiIconScale>
+	</ThingDef>
+	<ThingDef Class="BioReactor.BioReactorDef" Name="BioReactorSquareBase" ParentName="BioReactorBase" Abstract="True">
+		<designatorDropdown>BioReactor_SquareType</designatorDropdown>		
+		<uiIconPath>Things/Building/BioReactor_SquareType_Full</uiIconPath>
+		<uiIconOffset>(0, 0)</uiIconOffset>
+		<uiIconScale>1</uiIconScale>
+	</ThingDef>
+
+	<!-- 2X2 Size -->
+	<ThingDef Class="BioReactor.BioReactorDef" ParentName="BioReactorCircleBase">
+		<defName>BioReactor</defName>
+		<label>BioReactor (2X2)</label>
+		<graphicData>
+			<texPath>Things/Building/BioReactor_CircleType</texPath>
+			<graphicClass>Graphic_Single</graphicClass>
+			<drawSize>(7, 7)</drawSize>
+			<drawRotated>false</drawRotated>
+		</graphicData>
+		<statBases>
+			<WorkToBuild>3200</WorkToBuild>
+			<MaxHitPoints>150</MaxHitPoints>
+		</statBases>
+		<size>(2,2)</size>
+		<costList>
+			<Steel>120</Steel>
+			<ComponentIndustrial>4</ComponentIndustrial>
+		</costList>
+		<comps>			
+			<li Class="CompProperties_Power">
+				<compClass>BioReactor.CompBioPowerPlant</compClass>
+				<basePowerConsumption>-1000</basePowerConsumption>
+				<transmitsPower>true</transmitsPower>
+			</li>
+			<li Class="CompProperties_Refuelable">
+				<compClass>BioReactor.CompBioRefuelable</compClass>
+				<fuelConsumptionRate>8.0</fuelConsumptionRate>
+				<fuelCapacity>50.0</fuelCapacity>
+				<fuelFilter>
+					<categories>
+						<li>Foods</li>
+					</categories>
+					<disallowedThingDefs>
+						<li>Chocolate</li>
+						<li>Pemmican</li>
+						<li>Kibble</li>
+						<li>Hay</li>
+					</disallowedThingDefs>
+					<disallowedCategories>
+						<li>FoodMeals</li>
+						<li>AnimalProductRaw</li>
+						<li>EggsFertilized</li>
+					</disallowedCategories>
+				</fuelFilter>
+			</li>
+			<li Class="CompProperties_Glower">
+				<glowRadius>4</glowRadius>
+				<glowColor>(123,255,233,0)</glowColor>
+			</li>
+			<li Class="BioReactor.CompProperties_SecondLayer">
+				<graphicData>
+					<texPath>Things/Building/BioReactor_CircleType_Floor</texPath>
+					<graphicClass>Graphic_Single</graphicClass>
+					<drawSize>(7,7)</drawSize>
+					<drawRotated>false</drawRotated>
+				</graphicData>
+				<offset>(0,0,0)</offset>
+				<altitudeLayer>LayingPawn</altitudeLayer>
+			</li>
+		</comps>
+		<innerDrawOffset>(0, -0.05, 0.62)</innerDrawOffset>
+		<waterDrawCenter>(0, 0.25, 0.62)</waterDrawCenter>
+		<waterDrawSize>(1.6, 1.18)</waterDrawSize>
+		<bodySizeMin>0</bodySizeMin>
+		<bodySizeMax>1.3</bodySizeMax>
+	</ThingDef>
+	<!-- 3X3 Size -->
+	<ThingDef Class="BioReactor.BioReactorDef" ParentName="BioReactorCircleBase">
+		<defName>BioReactorCircleLarge</defName>
+		<label>BioReactor (3X3)</label>
+		<graphicData>
+			<texPath>Things/Building/BioReactor_CircleType</texPath>
+			<graphicClass>Graphic_Single</graphicClass>
+			<drawSize>(14, 10)</drawSize>
+			<drawRotated>false</drawRotated>
+		</graphicData>
+		<statBases>
+			<WorkToBuild>7500</WorkToBuild>
+			<MaxHitPoints>180</MaxHitPoints>
+		</statBases>
+		<size>(3,3)</size>
+		<costList>
+			<Steel>240</Steel>
+			<ComponentIndustrial>6</ComponentIndustrial>
+		</costList>
+		<comps>			
+			<li Class="CompProperties_Power">
+				<compClass>BioReactor.CompBioPowerPlant</compClass>
+				<basePowerConsumption>-1200</basePowerConsumption>
+				<transmitsPower>true</transmitsPower>
+			</li>
+			<li Class="CompProperties_Refuelable">
+				<compClass>BioReactor.CompBioRefuelable</compClass>
+				<fuelConsumptionRate>8.0</fuelConsumptionRate>
+				<fuelCapacity>75.0</fuelCapacity>
+				<fuelFilter>
+					<categories>
+						<li>Foods</li>
+					</categories>
+					<disallowedThingDefs>
+						<li>Chocolate</li>
+						<li>Pemmican</li>
+						<li>Kibble</li>
+						<li>Hay</li>
+					</disallowedThingDefs>
+					<disallowedCategories>
+						<li>FoodMeals</li>
+						<li>AnimalProductRaw</li>
+						<li>EggsFertilized</li>
+					</disallowedCategories>
+				</fuelFilter>
+			</li>
+			<li Class="CompProperties_Glower">
+				<glowRadius>5</glowRadius>
+				<glowColor>(123,255,233,0)</glowColor>
+			</li>
+			<li Class="BioReactor.CompProperties_SecondLayer">
+				<graphicData>
+					<texPath>Things/Building/BioReactor_CircleType_Floor</texPath>
+					<graphicClass>Graphic_Single</graphicClass>
+					<drawSize>(14, 10)</drawSize>
+					<drawRotated>false</drawRotated>
+				</graphicData>
+				<offset>(0,0,0)</offset>
+				<altitudeLayer>LayingPawn</altitudeLayer>
+			</li>
+		</comps>
+		<innerDrawOffset>(0, -0.05, 0.8)</innerDrawOffset>
+		<waterDrawCenter>(0.01, 0.25, 0.8)</waterDrawCenter>
+		<waterDrawSize>(2.4, 2.35)</waterDrawSize>
+		<bodySizeMin>0</bodySizeMin>
+		<bodySizeMax>3.5</bodySizeMax>
+	</ThingDef>
+	<!-- 4X4 Size -->
+	<ThingDef Class="BioReactor.BioReactorDef" ParentName="BioReactorCircleBase">
+		<defName>BioReactorCircleEX</defName>
+		<label>BioReactor (4X4)</label>
+		<graphicData>
+			<texPath>Things/Building/BioReactor_CircleType</texPath>
+			<graphicClass>Graphic_Single</graphicClass>
+			<drawSize>(18, 14)</drawSize>
+			<drawRotated>false</drawRotated>
+		</graphicData>
+		<statBases>
+			<WorkToBuild>12000</WorkToBuild>
+			<MaxHitPoints>230</MaxHitPoints>
+		</statBases>
+		<size>(4,4)</size>
+		<costList>
+			<Steel>360</Steel>
+			<ComponentIndustrial>8</ComponentIndustrial>
+		</costList>
+		<interactionCellOffset>(0,0,3)</interactionCellOffset>
+		<comps>			
+			<li Class="CompProperties_Power">
+				<compClass>BioReactor.CompBioPowerPlant</compClass>
+				<basePowerConsumption>-1400</basePowerConsumption>
+				<transmitsPower>true</transmitsPower>
+			</li>
+			<li Class="CompProperties_Refuelable">
+				<compClass>BioReactor.CompBioRefuelable</compClass>
+				<fuelConsumptionRate>8.0</fuelConsumptionRate>
+				<fuelCapacity>100.0</fuelCapacity>
+				<fuelFilter>
+					<categories>
+						<li>Foods</li>
+					</categories>
+					<disallowedThingDefs>
+						<li>Chocolate</li>
+						<li>Pemmican</li>
+						<li>Kibble</li>
+						<li>Hay</li>
+					</disallowedThingDefs>
+					<disallowedCategories>
+						<li>FoodMeals</li>
+						<li>AnimalProductRaw</li>
+						<li>EggsFertilized</li>
+					</disallowedCategories>
+				</fuelFilter>
+			</li>
+			<li Class="CompProperties_Glower">
+				<glowRadius>6</glowRadius>
+				<glowColor>(123,255,233,0)</glowColor>
+			</li>
+			<li Class="BioReactor.CompProperties_SecondLayer">
+				<graphicData>
+					<texPath>Things/Building/BioReactor_CircleType_Floor</texPath>
+					<graphicClass>Graphic_Single</graphicClass>
+					<drawSize>(18,14)</drawSize>
+					<drawRotated>false</drawRotated>
+				</graphicData>
+				<offset>(0,0,0)</offset>
+				<altitudeLayer>LayingPawn</altitudeLayer>
+			</li>
+		</comps>
+		<innerDrawOffset>(0, -0.05, 0.8)</innerDrawOffset>
+		<waterDrawCenter>(0.01, 0.25, 1.25)</waterDrawCenter>
+		<waterDrawSize>(3.5, 3)</waterDrawSize>
+		<bodySizeMin>0</bodySizeMin>
+		<bodySizeMax>8</bodySizeMax>
+	</ThingDef>
+
+
+	<!-- SquareType -->
+	<!-- 3X3 Size -->
+	<ThingDef Class="BioReactor.BioReactorDef" ParentName="BioReactorSquareBase">
+		<defName>BioReactorBig</defName>
+		<label>BioReactor (3X3)</label>
+		<graphicData>
+			<texPath>Things/Building/BioReactor_SquareType</texPath>
+			<graphicClass>Graphic_Single</graphicClass>
+			<drawSize>(8, 8)</drawSize>
+			<drawRotated>false</drawRotated>
+		</graphicData>
+		<statBases>
+			<WorkToBuild>7500</WorkToBuild>
+			<MaxHitPoints>180</MaxHitPoints>
+		</statBases>
+		<size>(3,3)</size>
+		<costList>
+			<Steel>240</Steel>
+			<ComponentIndustrial>6</ComponentIndustrial>
+		</costList>
+		<comps>			
+			<li Class="CompProperties_Power">
+				<compClass>BioReactor.CompBioPowerPlant</compClass>
+				<basePowerConsumption>-1200</basePowerConsumption>
+				<transmitsPower>true</transmitsPower>
+			</li>
+			<li Class="CompProperties_Refuelable">
+				<compClass>BioReactor.CompBioRefuelable</compClass>
+				<fuelConsumptionRate>8.0</fuelConsumptionRate>
+				<fuelCapacity>75.0</fuelCapacity>
+				<fuelFilter>
+					<categories>
+						<li>Foods</li>
+					</categories>
+					<disallowedThingDefs>
+						<li>Chocolate</li>
+						<li>Pemmican</li>
+						<li>Kibble</li>
+						<li>Hay</li>
+					</disallowedThingDefs>
+					<disallowedCategories>
+						<li>FoodMeals</li>
+						<li>AnimalProductRaw</li>
+						<li>EggsFertilized</li>
+					</disallowedCategories>
+				</fuelFilter>
+			</li>
+			<li Class="CompProperties_Glower">
+				<glowRadius>5</glowRadius>
+				<glowColor>(123,255,233,0)</glowColor>
+			</li>
+			<li Class="BioReactor.CompProperties_SecondLayer">
+				<graphicData>
+					<texPath>Things/Building/BioReactor_SquareType_Floor</texPath>
+					<graphicClass>Graphic_Single</graphicClass>
+					<drawSize>(8,8)</drawSize>
+					<drawRotated>false</drawRotated>
+				</graphicData>
+				<offset>(0,0,0)</offset>
+				<altitudeLayer>LayingPawn</altitudeLayer>
+			</li>
+		</comps>
+		<innerDrawOffset>(0, -0.05, 0.4)</innerDrawOffset>
+		<waterDrawCenter>(0, 0.25, 0.5)</waterDrawCenter>
+		<waterDrawSize>(2.3, 2.65)</waterDrawSize>
+		<bodySizeMin>0</bodySizeMin>
+		<bodySizeMax>3.5</bodySizeMax>
+	</ThingDef>
+	<!-- 4X4 Size -->
+	<ThingDef Class="BioReactor.BioReactorDef" ParentName="BioReactorSquareBase">
+		<defName>BioReactorEx</defName>
+		<label>BioReactor (4X4)</label>
+		<graphicData>
+			<texPath>Things/Building/BioReactor_SquareType</texPath>
+			<graphicClass>Graphic_Single</graphicClass>
+			<drawSize>(11, 11)</drawSize>
+			<drawRotated>false</drawRotated>
+		</graphicData>
+		<statBases>
+			<WorkToBuild>12000</WorkToBuild>
+			<MaxHitPoints>230</MaxHitPoints>
+		</statBases>
+		<size>(4,4)</size>
+		<costList>
+			<Steel>360</Steel>
+			<ComponentIndustrial>8</ComponentIndustrial>
+		</costList>
+		<interactionCellOffset>(0,0,3)</interactionCellOffset>
+		<comps>			
+			<li Class="CompProperties_Power">
+				<compClass>BioReactor.CompBioPowerPlant</compClass>
+				<basePowerConsumption>-1400</basePowerConsumption>
+				<transmitsPower>true</transmitsPower>
+			</li>
+			<li Class="CompProperties_Refuelable">
+				<compClass>BioReactor.CompBioRefuelable</compClass>
+				<fuelConsumptionRate>8.0</fuelConsumptionRate>
+				<fuelCapacity>100.0</fuelCapacity>
+				<fuelFilter>
+					<categories>
+						<li>Foods</li>
+					</categories>
+					<disallowedThingDefs>
+						<li>Chocolate</li>
+						<li>Pemmican</li>
+						<li>Kibble</li>
+						<li>Hay</li>
+					</disallowedThingDefs>
+					<disallowedCategories>
+						<li>FoodMeals</li>
+						<li>AnimalProductRaw</li>
+						<li>EggsFertilized</li>
+					</disallowedCategories>
+				</fuelFilter>
+			</li>
+			<li Class="CompProperties_Glower">
+				<glowRadius>6</glowRadius>
+				<glowColor>(123,255,233,0)</glowColor>
+			</li>
+			<li Class="BioReactor.CompProperties_SecondLayer">
+				<graphicData>
+					<texPath>Things/Building/BioReactor_SquareType_Floor</texPath>
+					<graphicClass>Graphic_Single</graphicClass>
+					<drawSize>(11,11)</drawSize>
+					<drawRotated>false</drawRotated>
+				</graphicData>
+				<offset>(0,0,0)</offset>
+				<altitudeLayer>LayingPawn</altitudeLayer>
+			</li>
+		</comps>
+		<innerDrawOffset>(0, -0.05, 0.4)</innerDrawOffset>
+		<waterDrawCenter>(0, 0.25, 0.5)</waterDrawCenter>
+		<waterDrawSize>(2.5, 3.65)</waterDrawSize>
+		<bodySizeMin>0</bodySizeMin>
+		<bodySizeMax>8</bodySizeMax>
+	</ThingDef>
+
+	<WorkGiverDef>
+		<defName>CustomWorkRefuel</defName>
+		<label>refuel fuelable buildings</label>
+		<giverClass>BioReactor.WorkGiver_CustomRefuel</giverClass>
+		<workType>Hauling</workType>
+		<verb>refuel</verb>
+		<gerund>refueling</gerund>
+		<priorityInType>60</priorityInType>
+		<requiredCapacities>
+			<li>Manipulation</li>
+		</requiredCapacities>
+		<prioritizeSustains>true</prioritizeSustains>
+	</WorkGiverDef>
+	<JobDef>
+		<defName>CarryToBioReactor</defName>
+		<driverClass>BioReactor.JobDriver_CarryToBioReactor</driverClass>
+		<reportString>carrying TargetA to BioReactor.</reportString>
+		<casualInterruptible>false</casualInterruptible>
+		<taleOnCompletion>PutIntoBioReactor</taleOnCompletion>
+	</JobDef>
+
+	<JobDef>
+		<defName>EnterBioReactor</defName>
+		<driverClass>BioReactor.JobDriver_EnterBioReactor</driverClass>
+		<reportString>entering BioReactor.</reportString>
+		<taleOnCompletion>EnteredBioReactor</taleOnCompletion>
+		<allowOpportunisticPrefix>true</allowOpportunisticPrefix>
+	</JobDef>
+
+	<TaleDef>
+		<defName>PutIntoBioReactor</defName>
+		<label>put into BioReactor</label>
+		<taleClass>Tale_DoublePawn</taleClass>
+		<type>Volatile</type>
+		<baseInterest>5</baseInterest>
+		<firstPawnSymbol>CARRIER</firstPawnSymbol>
+		<secondPawnSymbol>SLEEPER</secondPawnSymbol>
+		<rulePack>
+			<rulesStrings>
+				<li>tale_noun->[CARRIER_nameDef] putting [SLEEPER_nameDef] into BioReactor</li>
+				<li>image->[CARRIER_nameFull] placing [SLEEPER_nameDef] inside a BioReactor [circumstance_group]</li>
+				<li>image->[CARRIER_nameFull] opening an empty BioReactor while supporting [SLEEPER_nameDef] [circumstance_group]</li>
+				<li>image->[CARRIER_nameFull] sealing [SLEEPER_nameDef] inside a BioReactor [circumstance_group]</li>
+				<li>image->[CARRIER_nameFull] walking away as [SLEEPER_nameDef] looks through the wall of a BioReactor [circumstance_group]</li>
+				<li>circumstance_phrase(p=3)->with a [AdjectiveAny] expression</li>
+				<li>circumstance_phrase->while consumed in thought</li>
+				<li>circumstance_phrase->while gazing at a faraway [TerrainFeature]</li>
+				<li>circumstance_phrase->with visible tension between the two</li>
+				<li>desc_sentence->[Quantity_adjphrase] [Animal]s rest near the scene.</li>
+				<li>desc_sentence->[Quantity_adjphrase] [Enemy]s approach the area.</li>
+				<li>desc_sentence->[CARRIER_nameDef] radiates determination.</li>
+				<li>desc_sentence->[SLEEPER_nameDef] is visibly wounded.</li>
+				<li>desc_sentence->[SLEEPER_nameDef] looks exhausted.</li>
+				<li>desc_sentence->[Quantity_adjphrase] filled BioReactor surround the scene.</li>
+			</rulesStrings>
+		</rulePack>
+	</TaleDef>
+
+	<TaleDef>
+		<defName>EnteredBioReactor</defName>
+		<label>entered BioReactor</label>
+		<taleClass>Tale_SinglePawn</taleClass>
+		<type>Volatile</type>
+		<baseInterest>5</baseInterest>
+		<rulePack>
+			<rulesStrings>
+				<li>tale_noun->[PAWN_nameDef] entering BioReactor</li>
+				<li>image->[PAWN_nameFull] put in to BioReactor [circumstance_group]</li>
+				<li>image->[PAWN_nameFull] opening an empty BioReactor [circumstance_group]</li>
+				<li>image->[PAWN_nameFull] sealing themselves inside a BioReactor [circumstance_group]</li>
+				<li>image->[PAWN_nameFull] looking through the wall of a BioReactor at a world they're about to leave [circumstance_group]</li>
+				<li>circumstance_phrase->with a [AdjectiveAngsty] expression</li>
+				<li>circumstance_phrase->while consumed in thought</li>
+				<li>circumstance_phrase->while gazing at a faraway [TerrainFeature]</li>
+				<li>circumstance_phrase->and talking quietly to themselves</li>
+				<li>desc_sentence->[Quantity_adjphrase] [Animal]s rest near the scene.</li>
+				<li>desc_sentence->[Quantity_adjphrase] [Enemy]s approach the area.</li>
+				<li>desc_sentence->[PAWN_nameDef] radiates determination.</li>
+				<li>desc_sentence->[PAWN_nameDef] is visibly wounded.</li>
+				<li>desc_sentence->A [Color] aurora shines in the background.</li>
+				<li>desc_sentence->[Quantity_adjphrase] filled BioReactor surround the scene.</li>
+			</rulesStrings>
+		</rulePack>
+	</TaleDef>
+
+	<ThoughtDef>
+		<defName>KnowHistolysisHumanlike</defName>
+		<durationDays>6</durationDays>
+		<stackLimit>5</stackLimit>
+		<nullifyingTraits>
+			<li>Psychopath</li>
+			<li>Bloodlust</li>
+			<li>Cannibal</li>
+		</nullifyingTraits>
+		<stages>
+			<li>
+				<label>We melted human alive.</label>
+				<description>A living person melted alive.Just melted i...urp..</description>
+				<baseMoodEffect>-6</baseMoodEffect>
+			</li>
+		</stages>
+	</ThoughtDef>
+	<ThoughtDef>
+		<defName>KnowHistolysisHumanlikeCannibal</defName>
+		<durationDays>0.5</durationDays>
+		<stackLimit>2</stackLimit>
+		<nullifyingTraits>
+			<li>Psychopath</li>
+			<li>Bloodlust</li>
+		</nullifyingTraits>
+		<requiredTraits>
+			<li>Cannibal</li>
+		</requiredTraits>
+		<stages>
+			<li>
+				<label>Disgusting</label>
+				<description>Seriously, It's killing my appetite.</description>
+				<baseMoodEffect>-4</baseMoodEffect>
+			</li>
+		</stages>
+	</ThoughtDef>
+	<ThoughtDef>
+		<defName>KnowHistolysisHumanlikePsychopath</defName>
+		<durationDays>3</durationDays>
+		<stackLimit>3</stackLimit>
+		<stackedEffectMultiplier>0.75</stackedEffectMultiplier>
+		<requiredTraits>
+			<li>Psychopath</li>
+			<li>Bloodlust</li>
+		</requiredTraits>
+		<stages>
+			<li>
+				<label>I saw people melting.</label>
+				<description>I saw it go back to the beginning... Beautiful.</description>
+				<baseMoodEffect>3</baseMoodEffect>
+			</li>
+		</stages>
+	</ThoughtDef>
+	<ThoughtDef>
+		<defName>LivingBattery</defName>
+		<durationDays>2</durationDays>
+		<stackLimit>1</stackLimit>
+		<stages>
+			<li>
+				<label>I became Living battery.</label>
+				<description>I became living battery alive. I Don't want to go back there.</description>
+				<baseMoodEffect>-4</baseMoodEffect>
+			</li>
+		</stages>
+	</ThoughtDef>
+
+	<DesignatorDropdownGroupDef>
+		<defName>BioReactor_CircleType</defName>
+	</DesignatorDropdownGroupDef>	
+	<DesignatorDropdownGroupDef>
+		<defName>BioReactor_SquareType</defName>
+	</DesignatorDropdownGroupDef>
+</Defs>
+
