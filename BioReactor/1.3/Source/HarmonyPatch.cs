@@ -25,9 +25,6 @@ namespace BioReactor
             harmonyInstance.Patch(
                 original: AccessTools.Method(typeof(FloatMenuMakerMap), "AddHumanlikeOrders"),
                 prefix: new HarmonyMethod(patchType, "Prefix_AddHumanlikeOrders", null));
-            harmonyInstance.Patch(
-                original: AccessTools.Method(typeof(ThingOwnerUtility), "ContentsSuspended"),
-                prefix: new HarmonyMethod(patchType, "Prefix_ContentsSuspended", null));
         }
 
         public static bool Prefix_AddHumanlikeOrders(Vector3 clickPos, Pawn pawn, List<FloatMenuOption> opts)
@@ -66,20 +63,6 @@ namespace BioReactor
                 }
             }
             return true;
-        }
-        public static bool Prefix_ContentsSuspended(ref bool __result, IThingHolder holder)
-        {
-            while (holder != null)
-            {
-                if (holder is Building_BioReactor || holder is Building_CryptosleepCasket || holder is ImportantPawnComp)
-                {
-                    __result = true;
-                    return false;
-                }
-                holder = holder.ParentHolder;
-            }
-            __result = false;
-            return false;
         }
     }
 }

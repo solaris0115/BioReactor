@@ -13,7 +13,7 @@ using RimWorld.Planet;
 
 namespace BioReactor
 {
-    public class Building_BioReactor : Building_Casket
+    public class Building_BioReactor : Building_Casket,ISuspendableThingHolder
     {
         /// <summary>
         /// 내부 캐릭터 드로우 좌표. 리액터 실좌표 중심으로 드로우.
@@ -489,6 +489,14 @@ namespace BioReactor
             get
             {
                 return copied;
+            }
+        }
+
+        bool ISuspendableThingHolder.IsContentsSuspended
+        {
+            get
+            {
+                return true;
             }
         }
 
